@@ -10,16 +10,16 @@ from museflow.config import Configuration, configurable
 from museflow.model_utils import (DatasetManager, create_train_op, prepare_train_and_val_data,
                                   make_simple_dataset, set_random_seed)
 from museflow.nn.rnn import InputWrapper
+from museflow.note_sequence_utils import filter_sequence, set_note_fields
 from museflow.trainer import BasicTrainer
 import numpy as np
 import tensorflow as tf
 
-from ocifka_phd.models.roll2seq_style_transfer_v3 import CNN
-from ocifka_phd.io.symbolic_style_transfer_io import EvalPipeline, MidiPipeline, TrainLoader
-from ocifka_phd.note_sequence_utils import filter_sequence, set_note_fields
+from groove2groove.io import EvalPipeline, MidiPipeline, TrainLoader
+from groove2groove.models.common import CNN
 
 
-_LOGGER = logging.getLogger('groove2groove.model')
+_LOGGER = logging.getLogger(__name__)
 
 
 @configurable(pass_kwargs=False)
