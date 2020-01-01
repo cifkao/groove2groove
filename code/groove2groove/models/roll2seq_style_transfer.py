@@ -64,12 +64,10 @@ class CNNRNNSeq2Seq:
         if style_dropout:
             self.style_vector = style_dropout(self.style_vector, training=self._is_training)
 
-        decoder_kwargs = {}
         def cell_wrap_fn(cell):
             """Wrap the RNN cell in order to pass the style embedding as input."""
             cell = InputWrapper(cell, input_fn=lambda _: self.style_vector)
             return cell
-        decoder_kwargs['cell_wrap_fn'] = cell_wrap_fn
 
         with tf.variable_scope('attention'):
             attention = self._cfg['attention_mechanism'].maybe_configure(memory=encoder_states)
@@ -80,7 +78,7 @@ class CNNRNNSeq2Seq:
                                                       attention_mechanism=attention,
                                                       pre_attention=True,
                                                       training=self._is_training,
-                                                      **decoder_kwargs)
+                                                      cell_wrap_fn=cell_wrap_fn)
 
         # Build the training version of the decoder and the training ops
         self.training_ops = None

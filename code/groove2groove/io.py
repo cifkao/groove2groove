@@ -15,7 +15,6 @@ from museflow.note_sequence_utils import normalize_tempo, split_on_downbeats
 import numpy as np
 
 
-
 _LOGGER = logging.getLogger(__name__)
 
 
