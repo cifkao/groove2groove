@@ -1,0 +1,19 @@
+language: python
+python:
+  - "3.6"
+jobs:
+  include:
+    - name: 'Pylint'
+      install:
+        - pip install -r requirements.txt
+        - pip install './code[gpu]'
+        - pip install pylint pylint-quotes
+      script:
+        - cd code && pylint groove2groove
+    - name: 'Code style'
+      install:
+        - pip install pycodestyle pydocstyle
+      script:
+        - cd code
+        - pycodestyle groove2groove
+        - pydocstyle groove2groove
