@@ -4,7 +4,7 @@ lmdb==0.98
 magenta.music @ git+https://github.com/cifkao/magenta@magenta.music
 museflow @ git+https://github.com/cifkao/museflow@master
 mido==1.2.6
-numpy==1.16.0
+numpy==1.18.0
 pandas==0.25.3
 pretty-midi==0.2.8
 PyYAML==5.2
