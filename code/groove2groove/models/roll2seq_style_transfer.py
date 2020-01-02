@@ -14,6 +14,7 @@ from museflow.note_sequence_utils import filter_sequence, set_note_fields
 from museflow.trainer import BasicTrainer
 import numpy as np
 import tensorflow as tf
+import tqdm
 
 from groove2groove.io import EvalPipeline, MidiPipeline, TrainLoader
 from groove2groove.models.common import CNN
@@ -192,7 +193,7 @@ class TranslationExperiment:
         metadata_list = []  # gather metadata about each item of the dataset
         apply_filters = '__program__' if args.filters == 'program' else True
         dataset = make_simple_dataset(
-            self._load_data(pipeline, apply_filters=apply_filters,
+            self._load_data(tqdm.tqdm(pipeline), apply_filters=apply_filters,
                             metadata_list=metadata_list),
             output_types=self.input_types,
             output_shapes=self.input_shapes,
