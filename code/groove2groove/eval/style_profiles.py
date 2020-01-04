@@ -56,9 +56,11 @@ def time_pitch_diff_hist(data, max_time=2, bin_size=1/6, pitch_range=20, normed=
     if not time_diffs and not allow_empty:
         return None
 
-    histogram, _, _ = np.histogram2d(intervals, time_diffs, normed=normed,
-                                     bins=[np.arange(-(pitch_range + 1), pitch_range + 1) + 0.5,
-                                           np.arange(0., max_time + bin_size - epsilon, bin_size)])
+    with np.errstate(divide='ignore', invalid='ignore'):
+        histogram, _, _ = np.histogram2d(
+            intervals, time_diffs, normed=normed,
+            bins=[np.arange(-(pitch_range + 1), pitch_range + 1) + 0.5,
+                  np.arange(0., max_time + bin_size - epsilon, bin_size)])
     np.nan_to_num(histogram, copy=False)
 
     return histogram
@@ -90,11 +92,12 @@ def extract_note_stats(cfg, data):
     @configurable(['features'])
     def make_hist(cfg, name, normed=True):
         feature_names = [f['name'] for f in cfg.get('features')]
-        hist, _ = np.histogramdd(
-            sample=[feature_values[name] for name in feature_names],
-            bins=[cfg['features'][i]['bins'].configure(features[name].get_bins)
-                  for i, name in enumerate(feature_names)],
-            normed=normed)
+        with np.errstate(divide='ignore', invalid='ignore'):
+            hist, _ = np.histogramdd(
+                sample=[feature_values[name] for name in feature_names],
+                bins=[cfg['features'][i]['bins'].configure(features[name].get_bins)
+                      for i, name in enumerate(feature_names)],
+                normed=normed)
         np.nan_to_num(hist, copy=False)
 
         return name, hist
