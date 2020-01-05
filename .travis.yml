@@ -14,9 +14,10 @@ jobs:
         - pylint groove2groove
     - name: 'Code style'
       install:
-        - pip install pycodestyle pydocstyle
+        - pip install pycodestyle pydocstyle isort
       before_script:
         - cd code
       script:
         - pycodestyle groove2groove
         - pydocstyle groove2groove
+        - isort --check-only --recursive --diff groove2groove
