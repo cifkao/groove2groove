@@ -1,7 +1,6 @@
 import logging
 
 import tensorflow as tf
-
 from museflow.components import Component, using_scope
 from museflow.config import configurable
 

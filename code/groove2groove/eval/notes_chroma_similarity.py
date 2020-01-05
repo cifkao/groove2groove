@@ -5,12 +5,12 @@ Autoregressive Models", Wei-Tsung Lu and Li Su, ISMIR 2018.
 http://ismir2018.ircam.fr/doc/pdfs/107_Paper.pdf
 """
 
-from magenta.music.protobuf.music_pb2 import NoteSequence
-from magenta.music import midi_io
 import numpy as np
 import pretty_midi
 import scipy.signal
 import scipy.spatial.distance
+from magenta.music import midi_io
+from magenta.music.protobuf.music_pb2 import NoteSequence
 
 
 def chroma_similarity(sequence_a, sequence_b, sampling_rate, window_size, stride,

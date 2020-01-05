@@ -5,21 +5,20 @@ model. A pipeline is a loader that additionally supports saving the outputs of t
 that makes it possible to pair them with the inputs.
 """
 import abc
-import csv
 import collections
 import contextlib
+import csv
 import gzip
 import json
 import logging
 import random
 
 import lmdb
-from magenta.music.protobuf import music_pb2
+import numpy as np
 from magenta.music import midi_io, sequences_lib
+from magenta.music.protobuf import music_pb2
 from museflow.io.note_sequence_io import save_sequences_db
 from museflow.note_sequence_utils import normalize_tempo, split_on_downbeats
-import numpy as np
-
 
 _LOGGER = logging.getLogger(__name__)
 

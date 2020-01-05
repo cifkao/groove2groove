@@ -9,13 +9,12 @@ import sys
 
 import coloredlogs
 import lmdb
+import numpy as np
 from magenta.music.protobuf.music_pb2 import NoteSequence
 from museflow import note_sequence_utils
-from museflow.config import configurable, Configuration
-import numpy as np
+from museflow.config import Configuration, configurable
 
 from groove2groove.eval import note_features
-
 
 _LOGGER = logging.getLogger('ocifka_phd')
 

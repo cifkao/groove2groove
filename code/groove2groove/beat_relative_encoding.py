@@ -1,15 +1,14 @@
-from collections import defaultdict
 import heapq
 import logging
 import warnings
+from collections import defaultdict
 
-from magenta.music.protobuf import music_pb2
-from magenta.music.constants import STANDARD_PPQ
-from museflow.vocabulary import Vocabulary
-from museflow.encodings.performance_encoding import _compress_note_offs
-from museflow import note_sequence_utils
 import numpy as np
-
+from magenta.music.constants import STANDARD_PPQ
+from magenta.music.protobuf import music_pb2
+from museflow import note_sequence_utils
+from museflow.encodings.performance_encoding import _compress_note_offs
+from museflow.vocabulary import Vocabulary
 
 _LOGGER = logging.getLogger(__name__)
 
