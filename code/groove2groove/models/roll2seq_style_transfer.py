@@ -10,8 +10,7 @@ import tqdm
 from magenta.music.protobuf import music_pb2
 from museflow.components import EmbeddingLayer, RNNDecoder, RNNLayer
 from museflow.config import Configuration, configurable
-from museflow.model_utils import (DatasetManager, create_train_op,
-                                  make_simple_dataset,
+from museflow.model_utils import (DatasetManager, create_train_op, make_simple_dataset,
                                   prepare_train_and_val_data, set_random_seed)
 from museflow.nn.rnn import InputWrapper
 from museflow.note_sequence_utils import filter_sequence, set_note_fields
