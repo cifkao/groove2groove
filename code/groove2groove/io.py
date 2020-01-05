@@ -41,14 +41,16 @@ class TrainLoader(Loader):
     `(source, style, target)` for supervised training.
 
     Args:
-        metadata_path: Path to a gzipped JSON file mapping database keys to metadata.
+        metadata_path: Path to a gzipped JSON file mapping database keys to metadata. Each entry
+            needs to have `'song_name'`, `'segment_id'` (unique within each song) and `'style'`.
         db_path: Path to a LMDB database of `NoteSequence`s (use if the source and the target
             database are the same).
         source_db_path: Path to the source database (if different from the target database).
-        target_db_path: Path to the target database (if different from the source database).
+        target_db_path: Path to the target database (if different from the source database). Used
+            to load style and target sequences.
         mode: Either `'one_shot_random'` or `'style_id'`. `'one_shot_random'` yields triplets
             `(source_seq, style_seq, target_seq)` by looping through all `(source_seq, target_seq)`
-            pairs and choosing `style_seq` randomly from all segments with the same style as
+            pairs and choosing `style_seq` randomly from all sequences with the same style as
             `target_seq`. `style_id` yields triplets `(source_seq, target_style_id, target_seq)`
             where `style_id` is a string identifying the target style.
         random_seed: Random seed.
