@@ -1,3 +1,9 @@
+"""Data loader and pipeline classes.
+
+A loader simply iterates through a dataset and returns tuples of examples to use as inputs for a
+model. A pipeline is a loader that additionally supports saving the outputs of the model in a way
+that makes it possible to pair them with the inputs.
+"""
 import abc
 import csv
 import collections
@@ -29,10 +35,33 @@ class Loader(abc.ABC):
 
 
 class TrainLoader(Loader):
+    """Training data loader for style transfer and translation.
+
+    The loader reads an LMDB database containing Magenta `NoteSequence`s and yields triplets
+    `(source, style, target)` for supervised training.
+
+    Args:
+        metadata_path: Path to a gzipped JSON file mapping database keys to metadata.
+        db_path: Path to a LMDB database of `NoteSequence`s (use if the source and the target
+            database are the same).
+        source_db_path: Path to the source database (if different from the target database).
+        target_db_path: Path to the target database (if different from the source database).
+        mode: Either `'one_shot_random'` or `'style_id'`. `'one_shot_random'` yields triplets
+            `(source_seq, style_seq, target_seq)` by looping through all `(source_seq, target_seq)`
+            pairs and choosing `style_seq` randomly from all segments with the same style as
+            `target_seq`. `style_id` yields triplets `(source_seq, target_style_id, target_seq)`
+            where `style_id` is a string identifying the target style.
+        random_seed: Random seed.
+        reseed: Whether the random generator should be reset every time the loader is used. Causes
+            all epochs to be identical.
+        allow_same_style: Whether the source and target style can be the same.
+        autoencode: Whether the source and target should always be the same. This causes
+            `allow_same_style` to be ignored.
+    """
 
     def __init__(self, metadata_path, db_path=None, source_db_path=None, target_db_path=None,
-                 random_seed=None, reseed=False, allow_same_style=False, autoencode=False,
-                 mode='one_shot_random'):
+                 mode='one_shot_random', random_seed=None, reseed=False, allow_same_style=False,
+                 autoencode=False):
         self._source_db_path = source_db_path or db_path
         self._target_db_path = target_db_path
 
@@ -109,6 +138,17 @@ class TrainLoader(Loader):
 
 
 class EvalPipeline(Loader):
+    """Evaluation data pipeline.
+
+    Yields pairs `(source_seq, style_seq)` or `(source_seq, target_style_id)`.
+
+    Args:
+        source_db_path: Path to the source database.
+        key_pairs_path: Path to a TSV file containing a source key and a target key on each line.
+        style_db_path: Path to the style database. If `None`, the target key in each pair will be
+            treated as a style ID and returned instead of the target sequence.
+        skip_empty: Whether to skip examples containing no notes.
+    """
 
     def __init__(self, source_db_path, key_pairs_path, style_db_path=None, skip_empty=True):
         # If style_db_path is None, run in style translation mode (passing style IDs instead
@@ -174,6 +214,21 @@ class EvalPipeline(Loader):
 
 
 class MidiPipeline(Loader):
+    """Style transfer evaluation data pipeline for MIDI files.
+
+    Yields pairs `(source_seq, style_seq)` loaded from a given pair of MIDI files. The source file
+    will be split on downbeats if `bars_per_segment` is specified, but the style file will be used
+    as a whole. If the user wishes to use a specific segment of the style file, they need to
+    extract it before feeding the MIDI file to the loader.
+
+    Args:
+        source_path: Path to the source MIDI file.
+        style_path: Path to the style MIDI file.
+        bars_per_segment: Number of bars per segment of the source file. If `None`, no splitting
+            will be done.
+        warp: If `True`, the inputs will be normalized to 60 BPM and the outputs will be stretched
+            to the tempo of the style input.
+    """
 
     def __init__(self, source_path, style_path, bars_per_segment=None, warp=False):
         self._source_path = source_path
@@ -212,6 +267,9 @@ class MidiPipeline(Loader):
         self._durations = np.diff(boundaries).tolist()
 
     def save(self, sequences, path):
+        if self.key_pairs is None:
+            raise RuntimeError("'save' called before 'load'")
+
         sequences = list(sequences)
         if len(sequences) != len(self._durations):
             raise RuntimeError(f'Expected {len(self._durations)} sequences, got {len(sequences)}')
