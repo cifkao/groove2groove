@@ -146,7 +146,7 @@ class EvalPipeline(Loader):
         source_db_path: Path to the source database.
         key_pairs_path: Path to a TSV file containing a source key and a target key on each line.
         style_db_path: Path to the style database. If `None`, the target key in each pair will be
-            treated as a style ID and returned instead of the target sequence.
+            treated as a style ID and returned instead of the style sequence.
         skip_empty: Whether to skip examples containing no notes.
     """
 
