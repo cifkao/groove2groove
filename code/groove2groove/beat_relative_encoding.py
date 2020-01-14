@@ -16,11 +16,14 @@ _LOGGER = logging.getLogger(__name__)
 class BeatRelativeEncoding:
 
     def __init__(self, units_per_beat=12, velocity_unit=4, use_velocity=True, default_velocity=127,
-                 use_all_off_event=False, errors='remove', warn_on_errors=False):
+                 use_all_off_event=False, use_drum_events=False, errors='remove',
+                 warn_on_errors=False):
+
         self._units_per_beat = units_per_beat
         self._velocity_unit = velocity_unit
         self._use_velocity = use_velocity
         self._use_all_off_event = use_all_off_event
+        self._use_drum_events = use_drum_events
         self._errors = errors
         self._warn_on_errors = warn_on_errors
 
@@ -28,6 +31,9 @@ class BeatRelativeEncoding:
                     [('NoteOn', i) for i in range(128)] +
                     [('NoteOff', i) for i in range(128)] +
                     ([('NoteOff', '*')] if use_all_off_event else []) +
+                    ([('DrumOn', i) for i in range(128)] +
+                     [('DrumOff', i) for i in range(128)]
+                     if use_drum_events else []) +
                     [('SetTime', i) for i in range(units_per_beat)] +
                     [('SetTimeNext', i) for i in range(units_per_beat)])
 
@@ -72,9 +78,16 @@ class BeatRelativeEncoding:
                     velocity_quantized = note_velocity_quantized
                     if self._use_velocity:
                         events.append(('SetVelocity', velocity_quantized))
-                events.append(('NoteOn', note.pitch))
+
+                if note.is_drum and self._use_drum_events:
+                    events.append(('DrumOn', note.pitch))
+                else:
+                    events.append(('NoteOn', note.pitch))
             else:
-                events.append(('NoteOff', note.pitch))
+                if note.is_drum and self._use_drum_events:
+                    events.append(('DrumOff', note.pitch))
+                else:
+                    events.append(('NoteOff', note.pitch))
 
         if self._use_all_off_event:
             events = _compress_note_offs(events)
@@ -117,13 +130,14 @@ class BeatRelativeEncoding:
 
             if event == 'SetVelocity':
                 velocity = (value - 1) * self._velocity_unit
-            elif event == 'NoteOn':
+            elif event in ['NoteOn', 'DrumOn']:
                 note = sequence.notes.add()
                 note.start_time = t
                 note.pitch = value
                 note.velocity = velocity
+                note.is_drum = (event == 'DrumOn')
                 notes_on[note.pitch].append(note)
-            elif event == 'NoteOff':
+            elif event in ['NoteOff', 'DrumOff']:
                 if value == '*':
                     assert self._use_all_off_event
 
@@ -194,7 +208,8 @@ class _NoteEventQueue:
         # way to make sure that we never pop the offset first.
         # Below, the ID of the Note object is used to stop the heap algorithm from
         # comparing the Note itself, which would raise an exception.
-        self._heap = [(self._quantize(note.start_time), True, note.pitch, id(note), note)
+        self._heap = [(self._quantize(note.start_time), True, note.pitch, note.is_drum,
+                       id(note), note)
                       for note in sequence.notes]
         heapq.heapify(self._heap)
 
@@ -206,11 +221,12 @@ class _NoteEventQueue:
             event (expressed as the number of quantization steps if applicable) and `note`
             is the corresponding `Note` object.
         """
-        time, is_onset, _, _, note = heapq.heappop(self._heap)
+        time, is_onset, _, _, _, note = heapq.heappop(self._heap)
         if is_onset:
             # Add the offset to the queue
             heapq.heappush(self._heap,
-                           (self._quantize(note.end_time), False, note.pitch, id(note), note))
+                           (self._quantize(note.end_time), False, note.pitch, note.is_drum,
+                            id(note), note))
 
         return time, note, is_onset
 
