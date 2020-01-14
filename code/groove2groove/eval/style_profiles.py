@@ -106,6 +106,19 @@ def extract_note_stats(cfg, data):
     return dict(stats_cfg.configure(make_hist))
 
 
+@configurable(['note_stats', 'time_pitch_diff'])
+def extract_all_stats(cfg, data):
+    results = {}
+    results['time_pitch_diff'] = cfg['time_pitch_diff'].configure(
+        time_pitch_diff_hist,
+        data=data,
+        normed=True,
+        allow_empty=False)
+    results.update(cfg['note_stats'].configure(extract_note_stats, data=data))
+
+    return {k: v for k, v in results.items() if v is not None}
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('db_path', metavar='DB-FILE')
@@ -150,12 +163,8 @@ def main():
             _LOGGER.info(f'Skipping style {style} with {total_notes} note(s).')
             continue
 
-        results['time_pitch_diff'][style] = cfg['time_pitch_diff'].configure(time_pitch_diff_hist,
-                                                                             data=sequences,
-                                                                             normed=True,
-                                                                             allow_empty=False)
-        note_stats = cfg['note_stats'].configure(extract_note_stats, data=sequences)
-        for stat_name, stat in note_stats.items():
+        stats = cfg.configure(extract_all_stats, data=sequences)
+        for stat_name, stat in stats.items():
             results[stat_name][style] = stat
 
     json.dump(dict(results), sys.stdout, default=lambda a: a.tolist(), separators=(',', ':'))
