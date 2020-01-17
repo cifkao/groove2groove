@@ -32,11 +32,6 @@ class CNNRNNSeq2Seq:
         self.dataset_manager = dataset_manager
 
         inputs, style_inputs, decoder_inputs, decoder_targets = self.dataset_manager.get_next()
-        batch_size = tf.shape(inputs)[0]
-
-        embeddings = self._cfg['embedding_layer'].configure(EmbeddingLayer,
-                                                            input_size=len(vocabulary),
-                                                            name='embedding_layer')
 
         cnn = self._cfg['encoder_cnn'].configure(CNN,
                                                  training=self._is_training,
@@ -44,10 +39,11 @@ class CNNRNNSeq2Seq:
         rnn = self._cfg['encoder_rnn'].configure(RNNLayer,
                                                  training=self._is_training,
                                                  name='encoder_rnn')
-        if inputs.dtype.is_integer:
-            encoder_states, _ = rnn(cnn(embeddings.embed(inputs)))
-        else:
-            encoder_states, _ = rnn(cnn(inputs))
+        encoder_states, _ = rnn(cnn(inputs))
+
+        embeddings = self._cfg['embedding_layer'].configure(EmbeddingLayer,
+                                                            input_size=len(vocabulary),
+                                                            name='embedding_layer')
 
         style_cnn = self._cfg['style_encoder_cnn'].configure(CNN,
                                                              training=self._is_training,
@@ -87,6 +83,7 @@ class CNNRNNSeq2Seq:
             self.training_ops = self._make_train_ops()
 
         # Build the sampling and greedy version of the decoder
+        batch_size = tf.shape(inputs)[0]
         self.softmax_temperature = tf.placeholder(tf.float32, [], name='softmax_temperature')
         self.sample_outputs, self.sample_final_state = self.decoder.decode(
             mode='sample',
@@ -159,17 +156,13 @@ class TranslationExperiment:
             train_loader = self._cfg['train_data'].configure(TrainLoader, random_seed=random_seed)
             val_loader = self._cfg['val_data'].configure(TrainLoader, random_seed=random_seed,
                                                          reseed=True)
-            kwargs = dict(
-                train_generator=self._load_data(train_loader, training=True),
-                val_generator=self._load_data(val_loader),
-            )
-
             self._cfg['data_prep'].configure(
                 prepare_train_and_val_data,
                 dataset_manager=self.dataset_manager,
+                train_generator=self._load_data(train_loader, training=True),
+                val_generator=self._load_data(val_loader),
                 output_types=self.input_types,
-                output_shapes=self.input_shapes,
-                **kwargs)
+                output_shapes=self.input_shapes)
 
     def train(self, args):
         del args
