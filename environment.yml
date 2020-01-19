@@ -37,7 +37,6 @@ dependencies:
     - coloredlogs==10.0
     - decorator==4.4.1
     - gast==0.3.2
-    - groove2groove==0.0.0
     - grpcio==1.26.0
     - h5py==2.10.0
     - humanfriendly==4.18
