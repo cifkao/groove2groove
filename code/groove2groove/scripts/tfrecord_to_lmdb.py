@@ -32,5 +32,6 @@ def main():
             for key, record in zip(keys, dataset):
                 txn.put(key, record.numpy())
 
+
 if __name__ == '__main__':
     main()

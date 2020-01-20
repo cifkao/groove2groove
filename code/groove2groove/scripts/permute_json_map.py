@@ -4,8 +4,8 @@
 The input and/or output file may be gzip-compressed.
 """
 import argparse
-import json
 import gzip
+import json
 import os
 import sys
 

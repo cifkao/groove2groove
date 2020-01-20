@@ -43,6 +43,5 @@ def main():
             total, src_db.stat()['entries'], missing), file=sys.stderr)
 
 
-
 if __name__ == '__main__':
     main()
