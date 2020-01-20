@@ -15,8 +15,8 @@ except ImportError:
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('input_files', nargs='+', metavar='INPUT_FILE')
-    parser.add_argument('output_file', metavar='OUTPUT_FILE')
+    parser.add_argument('input_files', nargs='+', metavar='INPUT-FILE')
+    parser.add_argument('output_file', metavar='OUTPUT-FILE')
     parser.add_argument('-i', '--instrument-re', type=re.compile, default=re.compile('.*'),
                         metavar='REGEX', help='a regular expression matching the instrument name')
     parser.add_argument('--instrument-id', type=lambda l: [int(x) for x in l.split(',')],

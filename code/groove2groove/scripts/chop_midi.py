@@ -62,8 +62,8 @@ def merge_equivalent_instruments(sequence, by_name=True, by_program=True):
 def main():
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('input_dir', metavar='INPUT_DIR')
-    parser.add_argument('output_prefix', metavar='OUTPUT_PREFIX')
+    parser.add_argument('input_dir', metavar='INPUT-DIR')
+    parser.add_argument('output_prefix', metavar='OUTPUT-PREFIX')
 
     parser.add_argument('-b', '--bars-per-segment', type=lambda l: [int(x) for x in l.split(',')],
                         default=[8], metavar='NUM',
