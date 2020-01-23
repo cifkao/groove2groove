@@ -144,6 +144,11 @@ class TranslationExperiment:
                                                   train_mode=train_mode,
                                                   vocabulary=self.output_encoding.vocabulary,
                                                   sampling_seed=sampling_seed)
+
+        self._load_checkpoint = self._cfg.get('load_checkpoint', None)
+        if self._load_checkpoint and self.model.training_ops is not None:
+            self.model.training_ops.init_op = ()
+
         self.trainer = self._cfg['trainer'].configure(BasicTrainer,
                                                       session=tf.Session(),
                                                       dataset_manager=self.dataset_manager,
@@ -166,6 +171,9 @@ class TranslationExperiment:
 
     def train(self, args):
         del args
+        if self._load_checkpoint:
+            self.trainer.load_variables(checkpoint_file=self._load_checkpoint)
+
         _LOGGER.info('Starting training.')
         self.trainer.train()
 
