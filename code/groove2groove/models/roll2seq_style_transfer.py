@@ -23,7 +23,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 @configurable(pass_kwargs=False)
-class CNNRNNSeq2Seq:
+class Model:
 
     def __init__(self, dataset_manager, train_mode, vocabulary, sampling_seed=None):
         self._train_mode = train_mode
@@ -122,7 +122,7 @@ class CNNRNNSeq2Seq:
 
 
 @configurable(pass_kwargs=False)
-class TranslationExperiment:
+class Experiment:
 
     def __init__(self, logdir, train_mode, sampling_seed=None):
         random_seed = self._cfg.get('random_seed', None)
@@ -139,7 +139,7 @@ class TranslationExperiment:
             output_types=self.input_types,
             output_shapes=tuple([None, *shape] for shape in self.input_shapes))
 
-        self.model = self._cfg['model'].configure(CNNRNNSeq2Seq,
+        self.model = self._cfg['model'].configure(Model,
                                                   dataset_manager=self.dataset_manager,
                                                   train_mode=train_mode,
                                                   vocabulary=self.output_encoding.vocabulary,
@@ -318,10 +318,10 @@ def main():
     subparsers = parser.add_subparsers(title='action')
 
     subparser = subparsers.add_parser('train')
-    subparser.set_defaults(func=TranslationExperiment.train, train_mode=True)
+    subparser.set_defaults(func=Experiment.train, train_mode=True)
 
     subparser = subparsers.add_parser('run-midi')
-    subparser.set_defaults(func=TranslationExperiment.run_midi, filters='program')
+    subparser.set_defaults(func=Experiment.run_midi, filters='program')
     subparser.add_argument('source_file', metavar='INPUTFILE')
     subparser.add_argument('style_file', metavar='STYLEFILE')
     subparser.add_argument('output_file', metavar='OUTPUTFILE')
@@ -336,7 +336,7 @@ def main():
     subparser.add_argument('-b', '--bars-per-segment', default=8, type=int)
 
     subparser = subparsers.add_parser('run-test')
-    subparser.set_defaults(func=TranslationExperiment.run_test)
+    subparser.set_defaults(func=Experiment.run_test)
     subparser.add_argument('source_db', metavar='INPUTDB')
     subparser.add_argument('style_db', metavar='STYLEDB')
     subparser.add_argument('key_pairs', metavar='KEYPAIRS')
@@ -357,7 +357,7 @@ def main():
         config = Configuration.from_yaml(f)
     _LOGGER.debug(config)
 
-    experiment = config.configure(TranslationExperiment,
+    experiment = config.configure(Experiment,
                                   logdir=args.logdir, train_mode=args.train_mode,
                                   sampling_seed=args.sampling_seed)
     args.func(experiment, args)
