@@ -172,7 +172,8 @@ class Experiment:
     def train(self, args):
         del args
         if self._load_checkpoint:
-            self.trainer.load_variables(checkpoint_file=self._load_checkpoint)
+            self.trainer.load_variables(
+                checkpoint_file=os.path.join(self.logdir, self._load_checkpoint))
 
         _LOGGER.info('Starting training.')
         self.trainer.train()
