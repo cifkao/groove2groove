@@ -214,8 +214,67 @@ class EvalPipeline(Loader):
         save_sequences_db(sequences, keys, db_path)
 
 
+class NoteSequencePipeline(Loader):
+    """Style transfer testing data pipeline for single `NoteSequence`s."""
+
+    def __init__(self, source_seq, style_seq, bars_per_segment=None, warp=False):
+        self._source_seq = source_seq
+        self._style_seq = style_seq
+        self._bars_per_segment = bars_per_segment
+        self._warp = warp
+
+        self.key_pairs = None
+        self._durations = []
+        self._target_tempo = None
+
+    def load(self):
+        self.key_pairs = []
+
+        source_seq_full = self._source_seq
+        style_seq = self._style_seq
+        if self._warp and style_seq.tempos:
+            self._target_tempo = style_seq.tempos[0].qpm
+            source_seq_full = normalize_tempo(source_seq_full, 60.)
+            style_seq = normalize_tempo(style_seq, 60.)
+
+        if self._bars_per_segment:
+            source_segments = split_on_downbeats(source_seq_full, self._bars_per_segment)
+        else:
+            source_segments = [source_seq_full]
+
+        boundaries = []
+        source_seq = None
+        for i, source_seq in enumerate(source_segments):
+            self.key_pairs.append((str(i), None))
+            boundaries.append(source_seq.subsequence_info.start_time_offset)
+            yield source_seq, style_seq, None
+
+        if source_seq is not None:  # If there was at least one segment
+            boundaries.append(source_seq.subsequence_info.start_time_offset + source_seq.total_time)
+            self._durations = np.diff(boundaries).tolist()
+        else:
+            self._durations = []
+
+    def postprocess(self, sequences):
+        if self.key_pairs is None:
+            raise RuntimeError("'postprocess' called before 'load'")
+
+        sequences = list(sequences)
+        if len(sequences) != len(self._durations):
+            raise RuntimeError(f'Expected {len(self._durations)} sequences, got {len(sequences)}')
+
+        sequences = [sequences_lib.trim_note_sequence(seq, 0., dur)
+                     for seq, dur in zip(sequences, self._durations)]
+        sequence = sequences_lib.concatenate_sequences(sequences, self._durations)
+        if self._warp and self._target_tempo:
+            sequence, _ = sequences_lib.adjust_notesequence_times(
+                sequence, lambda t: t * 60. / self._target_tempo)
+            sequence.tempos.add().qpm = self._target_tempo
+        return sequence
+
+
 class MidiPipeline(Loader):
-    """Style transfer evaluation data pipeline for MIDI files.
+    """Style transfer testing data pipeline for MIDI files.
 
     Yields pairs `(source_seq, style_seq)` loaded from a given pair of MIDI files. The source file
     will be split on downbeats if `bars_per_segment` is specified, but the style file will be used
@@ -232,56 +291,17 @@ class MidiPipeline(Loader):
     """
 
     def __init__(self, source_path, style_path, bars_per_segment=None, warp=False):
-        self._source_path = source_path
-        self._style_path = style_path
-        self._bars_per_segment = bars_per_segment
-        self._warp = warp
-
-        self.key_pairs = None
-        self._durations = []
-        self._target_tempo = None
+        self._seq_pipeline = NoteSequencePipeline(
+            source_seq=midi_io.midi_file_to_note_sequence(source_path),
+            style_seq=midi_io.midi_file_to_note_sequence(style_path),
+            bars_per_segment=bars_per_segment,
+            warp=warp)
 
     def load(self):
-        self.key_pairs = []
-
-        source_seq_full = midi_io.midi_file_to_note_sequence(self._source_path)
-        style_seq = midi_io.midi_file_to_note_sequence(self._style_path)
-        if self._warp:
-            self._target_tempo = style_seq.tempos[0].qpm
-            source_seq_full = normalize_tempo(source_seq_full, 60.)
-            style_seq = normalize_tempo(style_seq, 60.)
-
-        if self._bars_per_segment:
-            source_segments = split_on_downbeats(source_seq_full, self._bars_per_segment)
-        else:
-            source_segments = [source_seq_full]
-        assert len(source_segments) > 0
-
-        boundaries = []
-        for i, source_seq in enumerate(source_segments):
-            self.key_pairs.append((str(i), None))
-            boundaries.append(source_seq.subsequence_info.start_time_offset)
-            yield source_seq, style_seq, None
-        # source_seq is now the last source segment
-        boundaries.append(source_seq.subsequence_info.end_time_offset)  # pylint: disable=undefined-loop-variable
-
-        self._durations = np.diff(boundaries).tolist()
+        return self._seq_pipeline.load()
 
     def save(self, sequences, path):
-        if self.key_pairs is None:
-            raise RuntimeError("'save' called before 'load'")
-
-        sequences = list(sequences)
-        if len(sequences) != len(self._durations):
-            raise RuntimeError(f'Expected {len(self._durations)} sequences, got {len(sequences)}')
-
-        sequences = [sequences_lib.trim_note_sequence(seq, 0., dur)
-                     for seq, dur in zip(sequences, self._durations)]
-        sequence = sequences_lib.concatenate_sequences(sequences, self._durations)
-        if self._warp:
-            sequence, _ = sequences_lib.adjust_notesequence_times(
-                sequence, lambda t: t * 60. / self._target_tempo)
-            sequence.tempos.add().qpm = self._target_tempo
+        sequence = self._seq_pipeline.postprocess(sequences)
         midi_io.note_sequence_to_midi_file(sequence, path)
 
 
