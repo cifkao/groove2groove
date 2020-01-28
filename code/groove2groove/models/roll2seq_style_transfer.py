@@ -179,28 +179,34 @@ class Experiment:
         self.trainer.train()
 
     def run_midi(self, args):
-        self.run_test(args, midi=True)
+        pipeline = MidiPipeline(source_path=args.source_file, style_path=args.style_file,
+                                bars_per_segment=args.bars_per_segment, warp=True)
+        sequences = self._run_cli(args, pipeline)
+        pipeline.save(sequences, args.output_file)
 
-    def run_test(self, args, midi=False):
+    def run_test(self, args):
+        pipeline = EvalPipeline(source_db_path=args.source_db, style_db_path=args.style_db,
+                                key_pairs_path=args.key_pairs)
+        sequences = self._run_cli(args, pipeline)
+        pipeline.save(sequences, args.output_db)
+
+    def _run_cli(self, args, pipeline):
         self.trainer.load_variables(checkpoint_file=args.checkpoint)
+        return self.run(pipeline, batch_size=args.batch_size, filters=args.filters,
+                        sample=args.sample, softmax_temperature=args.softmax_temperature)
 
-        if midi:
-            pipeline = MidiPipeline(source_path=args.source_file, style_path=args.style_file,
-                                    bars_per_segment=args.bars_per_segment, warp=True)
-        else:
-            pipeline = EvalPipeline(source_db_path=args.source_db, style_db_path=args.style_db,
-                                    key_pairs_path=args.key_pairs)
-
+    def run(self, pipeline, batch_size=None, filters='program', sample=False,
+            softmax_temperature=1.):
         metadata_list = []  # gather metadata about each item of the dataset
-        apply_filters = '__program__' if args.filters == 'program' else True
+        apply_filters = '__program__' if filters == 'program' else True
         dataset = make_simple_dataset(
             self._load_data(tqdm.tqdm(pipeline), apply_filters=apply_filters,
                             metadata_list=metadata_list),
             output_types=self.input_types,
             output_shapes=self.input_shapes,
-            batch_size=args.batch_size)
+            batch_size=batch_size or self._cfg['data_prep'].get('val_batch_size'))
         output_ids = self.model.run(
-            self.trainer.session, dataset, args.sample, args.softmax_temperature)
+            self.trainer.session, dataset, sample, softmax_temperature) or []
         sequences = [self.output_encoding.decode(ids) for ids in output_ids]
         merged_sequences = []
         instrument_id = 0
@@ -227,7 +233,8 @@ class Experiment:
             instrument_info = merged_sequences[-1].instrument_infos.add()
             instrument_info.instrument = instrument_id
             instrument_info.name = meta['filter_name']
-        pipeline.save(merged_sequences, args.output_file if midi else args.output_db)
+
+        return merged_sequences
 
     def _load_data(self, loader, training=False, encode=True, apply_filters=True,
                    metadata_list=None):
@@ -322,12 +329,12 @@ def main():
     subparser.set_defaults(func=Experiment.train, train_mode=True)
 
     subparser = subparsers.add_parser('run-midi')
-    subparser.set_defaults(func=Experiment.run_midi, filters='program')
+    subparser.set_defaults(func=Experiment.run_midi)
     subparser.add_argument('source_file', metavar='INPUTFILE')
     subparser.add_argument('style_file', metavar='STYLEFILE')
     subparser.add_argument('output_file', metavar='OUTPUTFILE')
     subparser.add_argument('--checkpoint', default=None, type=str)
-    subparser.add_argument('--batch-size', default=1, type=int)
+    subparser.add_argument('--batch-size', default=None, type=int)
     subparser.add_argument('--sample', action='store_true')
     subparser.add_argument('--softmax-temperature', default=1., type=float)
     subparser.add_argument('--seed', type=int, dest='sampling_seed')
@@ -343,7 +350,7 @@ def main():
     subparser.add_argument('key_pairs', metavar='KEYPAIRS')
     subparser.add_argument('output_db', metavar='OUTPUTDB')
     subparser.add_argument('--checkpoint', default=None, type=str)
-    subparser.add_argument('--batch-size', default=32, type=int)
+    subparser.add_argument('--batch-size', default=None, type=int)
     subparser.add_argument('--sample', action='store_true')
     subparser.add_argument('--softmax-temperature', default=1., type=float)
     subparser.add_argument('--seed', type=int, dest='sampling_seed')
