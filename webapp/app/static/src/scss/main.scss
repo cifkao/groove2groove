@@ -1,0 +1,13 @@
+$icon-font-path: "~open-iconic/font/fonts/";
+@import "~bootstrap/scss/bootstrap";
+@import "~open-iconic/font/css/open-iconic-bootstrap";
+
+.section {
+  margin-top: 2ex;
+  margin-bottom: 2ex;
+}
+
+.visualizer-container {
+  overflow-x: auto;
+  margin-top: 1ex;
+}

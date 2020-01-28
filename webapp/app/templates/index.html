@@ -1,0 +1,94 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Groove2Groove</title>
+  </head>
+  <body>
+    <div class="container mt-3" style="display: none;">
+      <div class="section" data-sequence-id="content">
+        <h2>Content input</h2>
+        <div class="row">
+          <div class="input-group col-md-4 col-lg-6 mb-1 mb-md-0">
+            <div class="custom-file">
+               <input id="contentFile" type="file" class="custom-file-input midi-input">
+               <label for="contentFile" class="custom-file-label text-truncate">Choose MIDI file...</label>
+            </div>
+          </div>
+          <div class="input-group col-sm-6 col-md-4 col-lg-3 mb-1 mb-sm-0 after-content-loaded">
+            <div class="input-group-prepend">
+              <label for="contentStartTime" class="input-group-text">Start beat</label>
+            </div>
+            <input type="number" class="form-control start-time" id="contentStartTime" value="0" min="0" step="1">
+          </div>
+          <div class="input-group col-sm-6 col-md-4 col-lg-3 after-content-loaded">
+            <div class="input-group-prepend">
+              <label for="contentEndTime" class="input-group-text">End beat</label>
+            </div>
+            <input type="number" class="form-control end-time" id="contentEndTime" min="0" step="1">
+          </div>
+        </div>
+        <form class="form-inline mt-2 after-content-loaded">
+          <button type="button" class="btn btn-primary mb-1 mr-2 play-button" disabled><span class="oi oi-media-play" title="Play" aria-hidden="true"></span> <span class="text">Play</span></button>
+          <button type="button" class="btn btn-primary mb-1 mr-2 save-button" disabled><span class="oi oi-data-transfer-download" title="Save" aria-hidden="true"></span> Save</button>
+        </form>
+        <div class="visualizer-container card after-content-loaded">
+          <svg></svg>
+        </div>
+      </div>
+      <div class="section after-content-loaded" data-sequence-id="style">
+        <h2>Style input</h2>
+        <div class="row">
+          <div class="input-group col-md-4 col-lg-6 mb-1 mb-md-0">
+            <div class="custom-file">
+               <input id="styleFile" type="file" class="custom-file-input midi-input">
+               <label for="styleFile" class="custom-file-label text-truncate">Choose MIDI file...</label>
+            </div>
+          </div>
+          <div class="input-group col-sm-6 col-md-4 col-lg-3 mb-1 mb-sm-0 after-style-loaded">
+            <div class="input-group-prepend">
+              <label for="styleStartTime" class="input-group-text">Start beat</label>
+            </div>
+            <input type="number" class="form-control start-time" id="styleStartTime" value="0" min="0" step="1">
+          </div>
+          <div class="input-group col-sm-6 col-md-4 col-lg-3 after-style-loaded">
+            <div class="input-group-prepend">
+              <label for="styleEndTime" class="input-group-text">End beat</label>
+            </div>
+            <input type="number" class="form-control end-time" id="styleEndTime" min="0" step="1">
+          </div>
+        </div>
+        <form class="form-inline mt-2 after-style-loaded">
+          <button type="button" class="btn btn-primary mb-1 mr-2 play-button" disabled><span class="oi oi-media-play" title="Play" aria-hidden="true"></span> <span class="text">Play</span></button>
+          <button type="button" class="btn btn-primary mb-1 mr-2 save-button" disabled><span class="oi oi-data-transfer-download" title="Save" aria-hidden="true"></span> Save</button>
+        </form>
+        <div class="visualizer-container card after-style-loaded">
+          <svg></svg>
+        </div>
+      </div>
+      <div class="section after-style-loaded" data-sequence-id="output">
+        <h2>Output</h2>
+        <form class="form-inline">
+          <div class="input-group mb-1 mr-2">
+            <div class="input-group-prepend">
+              <button type="button" class="btn btn-primary generate-button"><span class="oi oi-cog" title="Generate" aria-hidden="true"></span> Generate</button>
+            </div>
+            <div class="input-group-prepend input-group-append">
+              <div class="input-group-text">
+                <input type="checkbox" id="samplingCheckbox" checked>
+                <label for="samplingCheckbox" class="ml-1">Sample with temperature:</label>
+              </div>
+            </div>
+            <input type="number" class="form-control" id="samplingTemperature" value="0.6" min="0.0" step="0.1" style="max-width: 4.5em">
+          </div>
+          <button type="button" class="btn btn-primary mb-1 mr-2 play-button after-generated"><span class="oi oi-media-play" title="Play" aria-hidden="true"></span> <span class="text">Play</span></button>
+          <button type="button" class="btn btn-primary mb-1 mr-2 save-button after-generated"><span class="oi oi-data-transfer-download" title="Save" aria-hidden="true"></span> Save</button>
+        </form>
+        <div class="visualizer-container card after-generated">
+          <svg></svg>
+        </div>
+      </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='bundle.js') }}"></script>
+  </body>
+</html>
