@@ -152,9 +152,6 @@ class EvalPipeline(Loader):
     """
 
     def __init__(self, source_db_path, key_pairs_path, style_db_path=None, skip_empty=True):
-        # If style_db_path is None, run in style translation mode (passing style IDs instead
-        # of style examples).
-
         self._source_db_path = source_db_path
         self._style_db_path = style_db_path
         self._key_pairs_path = key_pairs_path
