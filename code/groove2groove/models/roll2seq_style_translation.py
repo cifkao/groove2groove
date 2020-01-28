@@ -17,7 +17,7 @@ from museflow.note_sequence_utils import filter_sequence
 from museflow.trainer import BasicTrainer
 from museflow.vocabulary import Vocabulary
 
-from groove2groove.io import EvalPipeline, MidiPipeline, TrainLoader
+from groove2groove.io import EvalPipeline, TrainLoader
 from groove2groove.models.common import CNN
 
 _LOGGER = logging.getLogger(__name__)
@@ -178,18 +178,9 @@ class Experiment:
         _LOGGER.info('Starting training.')
         self.trainer.train()
 
-    def run_midi(self, args):
-        self.run_test(args, midi=True)
-
-    def run_test(self, args, midi=False):
+    def run_test(self, args):
         self.trainer.load_variables(checkpoint_file=args.checkpoint)
-
-        if midi:
-            pipeline = MidiPipeline(source_path=args.source_file, style_path=args.style_file,
-                                    bars_per_segment=args.bars_per_segment, warp=True)
-        else:
-            pipeline = EvalPipeline(source_db_path=args.source_db, style_db_path=args.style_db,
-                                    key_pairs_path=args.key_pairs)
+        pipeline = EvalPipeline(source_db_path=args.source_db, key_pairs_path=args.key_pairs)
 
         dataset = make_simple_dataset(
             self._load_data(tqdm.tqdm(pipeline)),
@@ -199,7 +190,7 @@ class Experiment:
         output_ids = self.model.run(
             self.trainer.session, dataset, args.sample, args.softmax_temperature)
         sequences = [self.output_encoding.decode(ids) for ids in output_ids]
-        pipeline.save(sequences, args.output_file if midi else args.output_db)
+        pipeline.save(sequences, args.output_db)
 
     def _load_data(self, loader, training=False, encode=True):
         max_target_len = self._cfg.get('max_target_length', np.inf)
@@ -253,25 +244,9 @@ def main():
     subparser = subparsers.add_parser('train')
     subparser.set_defaults(func=Experiment.train, train_mode=True)
 
-    subparser = subparsers.add_parser('run-midi')
-    subparser.set_defaults(func=Experiment.run_midi, filters='program')
-    subparser.add_argument('source_file', metavar='INPUTFILE')
-    subparser.add_argument('style_file', metavar='STYLEFILE')
-    subparser.add_argument('output_file', metavar='OUTPUTFILE')
-    subparser.add_argument('--checkpoint', default=None, type=str)
-    subparser.add_argument('--batch-size', default=1, type=int)
-    subparser.add_argument('--sample', action='store_true')
-    subparser.add_argument('--softmax-temperature', default=1., type=float)
-    subparser.add_argument('--seed', type=int, dest='sampling_seed')
-    subparser.add_argument('--filters', choices=['training', 'program'], default='program',
-                           help='how to filter the input; training: use the same filters as '
-                           'during training; program: filter by MIDI program')
-    subparser.add_argument('-b', '--bars-per-segment', default=8, type=int)
-
     subparser = subparsers.add_parser('run-test')
     subparser.set_defaults(func=Experiment.run_test)
     subparser.add_argument('source_db', metavar='INPUTDB')
-    subparser.add_argument('style_db', metavar='STYLEDB')
     subparser.add_argument('key_pairs', metavar='KEYPAIRS')
     subparser.add_argument('output_db', metavar='OUTPUTDB')
     subparser.add_argument('--checkpoint', default=None, type=str)
@@ -279,9 +254,6 @@ def main():
     subparser.add_argument('--sample', action='store_true')
     subparser.add_argument('--softmax-temperature', default=1., type=float)
     subparser.add_argument('--seed', type=int, dest='sampling_seed')
-    subparser.add_argument('--filters', choices=['training', 'program'], default='program',
-                           help='how to filter the input; training: use the same filters as '
-                           'during training; program: filter by MIDI program')
 
     args = parser.parse_args()
 
