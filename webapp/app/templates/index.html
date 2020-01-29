@@ -27,11 +27,7 @@
             <input type="number" class="form-control end-time" id="contentEndTime" min="0" step="1">
           </div>
         </div>
-        <form class="form-inline mt-2 after-content-loaded">
-          <button type="button" class="btn btn-primary mb-1 mr-2 play-button" disabled><span class="oi oi-media-play" title="Play" aria-hidden="true"></span> <span class="text">Play</span></button>
-          <button type="button" class="btn btn-primary mb-1 mr-2 save-button" disabled><span class="oi oi-data-transfer-download" title="Save" aria-hidden="true"></span> Save</button>
-        </form>
-        <div class="card visualizer-card after-content-loaded">
+        <div class="card visualizer-card mt-2 after-content-loaded">
           <div class="card-header">
             <div class="d-flex flex-row">
               <div class="p-2">Instruments:</div>
@@ -41,6 +37,12 @@
           </div>
           <div class="visualizer-container">
             <svg></svg>
+          </div>
+          <div class="card-footer">
+            <form class="form-inline mb-0">
+              <button type="button" class="btn btn-primary mr-2 play-button"><span class="oi oi-media-play" title="Play" aria-hidden="true"></span> <span class="text">Play</span></button>
+              <button type="button" class="btn btn-primary mr-2 save-button"><span class="oi oi-data-transfer-download" title="Save" aria-hidden="true"></span> Save</button>
+            </form>
           </div>
         </div>
       </div>
@@ -66,11 +68,7 @@
             <input type="number" class="form-control end-time" id="styleEndTime" min="0" step="1">
           </div>
         </div>
-        <form class="form-inline mt-2 after-style-loaded">
-          <button type="button" class="btn btn-primary mb-1 mr-2 play-button" disabled><span class="oi oi-media-play" title="Play" aria-hidden="true"></span> <span class="text">Play</span></button>
-          <button type="button" class="btn btn-primary mb-1 mr-2 save-button" disabled><span class="oi oi-data-transfer-download" title="Save" aria-hidden="true"></span> Save</button>
-        </form>
-        <div class="card visualizer-card after-style-loaded">
+        <div class="card visualizer-card mt-2 after-style-loaded">
           <div class="card-header">
             <div class="d-flex flex-row">
               <div class="p-2">Instruments:</div>
@@ -81,11 +79,29 @@
           <div class="visualizer-container">
             <svg></svg>
           </div>
+          <div class="card-footer">
+            <form class="form-inline mb-0">
+              <button type="button" class="btn btn-primary mr-2 play-button"><span class="oi oi-media-play" title="Play" aria-hidden="true"></span> <span class="text">Play</span></button>
+              <button type="button" class="btn btn-primary mr-2 save-button"><span class="oi oi-data-transfer-download" title="Save" aria-hidden="true"></span> Save</button>
+            </form>
+          </div>
         </div>
       </div>
       <div class="section after-style-loaded" data-sequence-id="output">
         <h2>Output</h2>
         <form class="form-inline">
+          <div class="input-group mb-1 mr-2">
+            <div class="input-group-prepend">
+              <div class="input-group-text">
+                Model
+              </div>
+            </div>
+            <select class="form-control" id="modelName">
+              {% for model_name, model_cfg in config.MODELS.items() %}
+              <option value="{{ model_name }}">{{ model_name }}</option>
+              {% endfor %}
+            </select>
+          </div>
           <div class="input-group mb-1 mr-2">
             <div class="input-group-prepend">
               <button type="button" class="btn btn-primary generate-button"><span class="oi oi-cog" title="Generate" aria-hidden="true"></span> Generate</button>
@@ -98,19 +114,22 @@
             </div>
             <input type="number" class="form-control" id="samplingTemperature" value="0.6" min="0.0" step="0.1" style="max-width: 4.5em">
           </div>
-          <button type="button" class="btn btn-primary mb-1 mr-2 play-button after-generated"><span class="oi oi-media-play" title="Play" aria-hidden="true"></span> <span class="text">Play</span></button>
-          <button type="button" class="btn btn-primary mb-1 mr-2 save-button after-generated"><span class="oi oi-data-transfer-download" title="Save" aria-hidden="true"></span> Save</button>
         </form>
-        <div class="card visualizer-card after-generated">
+        <div class="card visualizer-card mt-2 after-generated">
           <div class="card-header">
             <div class="d-flex flex-row">
               <div class="p-2">Instruments:</div>
-              <div class="p-2 instrument-toggles">
-              </div>
+              <div class="p-2 instrument-toggles"></div>
             </div>
           </div>
           <div class="visualizer-container">
             <svg></svg>
+          </div>
+          <div class="card-footer">
+            <form class="form-inline mb-0">
+              <button type="button" class="btn btn-primary mr-2 play-button"><span class="oi oi-media-play" title="Play" aria-hidden="true"></span> <span class="text">Play</span></button>
+              <button type="button" class="btn btn-primary mr-2 save-button"><span class="oi oi-data-transfer-download" title="Save" aria-hidden="true"></span> Save</button>
+            </form>
           </div>
         </div>
       </div>

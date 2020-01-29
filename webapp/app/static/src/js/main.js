@@ -98,7 +98,7 @@ $('.generate-button').on('click', function() {
 
   setControlsEnabled(section, false);
 
-  fetch('/api/v1/style_transfer/v02d_drums01/', {method: 'POST', body: formData})
+  fetch('/api/v1/style_transfer/' + $('#modelName').val() + '/', {method: 'POST', body: formData})
     .then((response) => response.arrayBuffer())
     .then(function (buffer) {
       // Decode the protobuffer
@@ -122,6 +122,7 @@ function initSequence(section, seq) {
   // Show piano roll
   const svg = section.find('svg')[0];
   data[seqId].visualizer = new mm.PianoRollSVGVisualizer(seq, svg, VISUALIZER_CONFIG);
+  section.find('.visualizer-container').animate({scrollLeft: 0}, 'fast');
 
   // Add instrument check boxes
   section.find('.instrument-toggles').empty();
@@ -167,7 +168,7 @@ function handleSequenceEdit() {
 }
 
 function setControlsEnabled(section, enabled) {
-  section.find('input, button').attr('disabled', !enabled);
+  section.find('input, button, select').attr('disabled', !enabled);
 }
 
 function handlePlaybackStop(button) {

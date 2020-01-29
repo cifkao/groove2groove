@@ -24,8 +24,8 @@ tf_lock = threading.Lock()
 
 @app.before_first_request
 def init_models():
-    for model_name in app.config['MODEL_NAMES']:
-        logdir = os.path.join(app.config['MODEL_ROOT'], model_name)
+    for model_name, model_cfg in app.config['MODELS'].items():
+        logdir = os.path.join(app.config['MODEL_ROOT'], model_cfg.get('logdir', model_name))
         with open(os.path.join(logdir, 'model.yaml'), 'rb') as f:
             config = Configuration.from_yaml(f)
 
@@ -33,7 +33,7 @@ def init_models():
         with model_graphs[model_name].as_default():
             models[model_name] = config.configure(roll2seq_style_transfer.Experiment,
                                                   logdir=logdir, train_mode=False)
-            models[model_name].trainer.load_variables()
+            models[model_name].trainer.load_variables(**model_cfg.get('load_variables', {}))
 
 
 @app.route('/')

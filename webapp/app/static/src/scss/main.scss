@@ -11,6 +11,12 @@ $icon-font-path: "~open-iconic/font/fonts/";
   overflow-x: auto;
 }
 
-.visualizer-card .card-header {
-  padding: 0.2rem 0.4rem;
+.visualizer-card {
+  .card-header {
+    padding: 0.2rem 0.4rem;
+  }
+
+  .card-footer {
+    padding: 0.7rem 0.9rem;
+  }
 }
