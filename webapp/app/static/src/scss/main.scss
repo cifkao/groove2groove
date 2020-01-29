@@ -9,5 +9,8 @@ $icon-font-path: "~open-iconic/font/fonts/";
 
 .visualizer-container {
   overflow-x: auto;
-  margin-top: 1ex;
+}
+
+.visualizer-card .card-header {
+  padding: 0.2rem 0.4rem;
 }
