@@ -7,6 +7,8 @@
     <div class="container mt-3" style="display: none;">
       <div class="section" data-sequence-id="content">
         <h2>Content input</h2>
+        <p>Pick a song to cover. The song needs to be in 4/4 and have accurate tempo information.
+           <span class='after-content-loaded'>You can choose a specific section of the song by specifying the start and end time in beats below (assuming the song has a uniform tempo).</span></p>
         <div class="row">
           <div class="input-group col-md-4 col-lg-6 mb-1 mb-md-0">
             <div class="custom-file">
@@ -48,6 +50,8 @@
       </div>
       <div class="section after-content-loaded" data-sequence-id="style">
         <h2>Style input</h2>
+        <p>This is the song to take the style from.
+           <span class="after-style-loaded">For best results, pick an 8-bar (32-beat) section.</span></p>
         <div class="row">
           <div class="input-group col-md-4 col-lg-6 mb-1 mb-md-0">
             <div class="custom-file">
@@ -109,7 +113,7 @@
             <div class="input-group-prepend input-group-append">
               <div class="input-group-text">
                 <input type="checkbox" id="samplingCheckbox" checked>
-                <label for="samplingCheckbox" class="ml-1">Sample with temperature:</label>
+                <label for="samplingCheckbox" class="ml-1 mb-0">Sample with temperature:</label>
               </div>
             </div>
             <input type="number" class="form-control" id="samplingTemperature" value="0.6" min="0.0" step="0.1" style="max-width: 4.5em">
@@ -120,6 +124,31 @@
             <div class="d-flex flex-row">
               <div class="p-2">Instruments:</div>
               <div class="p-2 instrument-toggles"></div>
+            </div>
+          </div>
+          <div class="visualizer-container">
+            <svg></svg>
+          </div>
+          <div class="card-footer">
+            <form class="form-inline mb-0">
+              <button type="button" class="btn btn-primary mr-2 play-button"><span class="oi oi-media-play" title="Play" aria-hidden="true"></span> <span class="text">Play</span></button>
+              <button type="button" class="btn btn-primary mr-2 save-button"><span class="oi oi-data-transfer-download" title="Save" aria-hidden="true"></span> Save</button>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="section after-generated" data-sequence-id="remix">
+        <h2>Remix</h2>
+        <p>Now add some of the original tracks (e.g.&nbsp;melody) and listen to the mix!</p>
+        <div class="card visualizer-card mt-2 after-generated">
+          <div class="card-header">
+            <div class="d-flex flex-row">
+              <div class="p-2">Output:</div>
+              <div class="p-2 instrument-toggles" id="remixOutputToggles"></div>
+            </div>
+            <div class="d-flex flex-row">
+              <div class="p-2">Content:</div>
+              <div class="p-2 instrument-toggles" id="remixContentToggles"></div>
             </div>
           </div>
           <div class="visualizer-container">

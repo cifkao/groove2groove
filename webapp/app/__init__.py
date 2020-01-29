@@ -5,6 +5,7 @@ import threading
 import flask
 from magenta.music.protobuf.music_pb2 import NoteSequence
 from museflow.config import Configuration
+from museflow.note_sequence_utils import normalize_tempo
 import tensorflow as tf
 
 from groove2groove.io import NoteSequencePipeline
@@ -38,7 +39,7 @@ def init_models():
 
 @app.route('/')
 def index():
-	return flask.render_template("index.html")
+    return flask.render_template("index.html")
 
 
 @app.route('/api/v1/style_transfer/<model_name>/', methods=['POST'])
@@ -55,5 +56,30 @@ def run_model(model_name):
         outputs = models[model_name].run(
                 pipeline, sample=sample, softmax_temperature=softmax_temperature)
     output_seq = pipeline.postprocess(outputs)
+    return flask.send_file(io.BytesIO(output_seq.SerializeToString()),
+                           mimetype='application/protobuf')
+
+@app.route('/api/v1/remix/', methods=['POST'])
+def remix():
+    files = flask.request.files
+    content_seq = NoteSequence.FromString(files['content_sequence'].read())
+    output_seq = NoteSequence.FromString(files['output_sequence'].read())
+    # We will be merging content_seq into output_seq
+
+    # Assume that output_seq has a constant tempo; warp content_seq to match it
+    if output_seq.tempos and content_seq.tempos:
+        content_seq = normalize_tempo(content_seq, output_seq.tempos[0].qpm)
+
+    # Shift instrument IDs to avoid collisions
+    instrument_offset = max([0, *(info.instrument for info in output_seq.instrument_infos)])
+    for collection in [content_seq.instrument_infos, content_seq.notes, content_seq.pitch_bends,
+                       content_seq.control_changes]:
+        for item in collection:
+            item.instrument += instrument_offset
+
+    total_time = max(content_seq.total_time, output_seq.total_time)
+    output_seq.MergeFrom(content_seq)
+    output_seq.total_time = total_time
+
     return flask.send_file(io.BytesIO(output_seq.SerializeToString()),
                            mimetype='application/protobuf')

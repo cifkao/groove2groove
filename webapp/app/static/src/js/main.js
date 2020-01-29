@@ -1,7 +1,6 @@
 import '../scss/main.scss';
 
 import { saveAs } from 'file-saver';
-import * as Tone from 'tone';
 import * as mm from '@magenta/music/node/core';
 import {NoteSequence} from '@magenta/music/node/protobuf';
 
@@ -14,7 +13,7 @@ const INSTRUMENT_NAMES = [
 ];
 const DRUMS = 'DRUMS';
 
-const data = {content: {}, style: {}, output: {}};
+const data = {content: {}, style: {}, output: {}, remix: {}};
 
 var controlCount = 0;  // counter used for assigning IDs to dynamically created controls
 
@@ -55,15 +54,16 @@ $('.play-button').on('click', function() {
   if (!data[seqId].player)
     data[seqId].player = new mm.SoundFontPlayer(
       "https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus",
-      Tone.Master, null, null, {
+      undefined, null, null, {
         run: (note) => data[seqId].visualizer.redraw(note, true),
         stop: () => handlePlaybackStop(this)
-		});
+    });
 
   if (data[seqId].player.isPlaying()) {
     data[seqId].player.stop();
     handlePlaybackStop(this);
   } else {
+    section.find('.visualizer-container').scrollLeft(0);
     data[seqId].player.start(data[seqId].sequence);
 
     // Change button icon and text
@@ -117,19 +117,23 @@ $('.generate-button').on('click', function() {
 function initSequence(section, seq) {
   const seqId = section.data('sequence-id');
   data[seqId].fullSequence = seq;
+  data[seqId].trimmedSequence = seq;
   data[seqId].sequence = seq;
 
   // Show piano roll
   const svg = section.find('svg')[0];
   data[seqId].visualizer = new mm.PianoRollSVGVisualizer(seq, svg, VISUALIZER_CONFIG);
-  section.find('.visualizer-container').animate({scrollLeft: 0}, 'fast');
+  section.find('.visualizer-container').scrollLeft(0);
 
-  // Add instrument check boxes
+  if (seqId == 'remix')
+    return;
+
+  // Add instrument checkboxes
   section.find('.instrument-toggles').empty();
   getSequencePrograms(seq).forEach(function (program) {
-    var controlId = 'checkbox' + (controlCount++);
-    var instrument = program == DRUMS ? 'Drums' : INSTRUMENT_NAMES[program];
-    var checkbox = $('<input type="checkbox" class="form-check-input" checked>')
+    const controlId = 'checkbox' + (controlCount++);
+    const instrument = program == DRUMS ? 'Drums' : INSTRUMENT_NAMES[program];
+    const checkbox = $('<input type="checkbox" class="form-check-input" checked>')
         .attr('id', controlId).val(program)
         .on('change', handleSequenceEdit);
     $('<div class="form-check form-check-inline"></div>')
@@ -137,11 +141,27 @@ function initSequence(section, seq) {
       .append($('<label class="form-check-label"></label>').attr('for', controlId).text(instrument))
       .appendTo(section.find('.instrument-toggles'));
   });
+
+  // Update the remix section if needed
+  if (seqId == 'content' || seqId == 'output') {
+    if (seqId == 'content') {
+      mirrorControls(section.find('.instrument-toggles'), $('#remixContentToggles'));
+    } else if (seqId == 'output') {
+      mirrorControls(section.find('.instrument-toggles'), $('#remixOutputToggles'));
+    }
+
+    initRemix();
+  }
 }
 
 function handleSequenceEdit() {
   const section = $(this).closest('[data-sequence-id]');
   const seqId = section.data('sequence-id');
+  if (seqId == 'remix') {
+    updateRemix();
+    return;
+  }
+
   var seq = data[seqId].fullSequence;
 
   const startTime = section.find('.start-time').val();
@@ -154,13 +174,53 @@ function handleSequenceEdit() {
   } else {
     seq = mm.sequences.clone(seq);
   }
+  data[seqId].trimmedSequence = seq;
 
-  const programs = section.find(".instrument-toggles :checked")
-    .map((_, checkbox) => $(checkbox).val())
-    .map((_, p) => isNaN(p) ? p : parseInt(p))
-    .get();
+  const programs = getSelectedPrograms(section.find('.instrument-toggles :checked'));
   filterSequence(seq, programs, true);  // filter in place
 
+  updateSequence(seqId, seq);
+
+  if ($(this).hasClass('start-time'))
+    section.find('.visualizer-container').scrollLeft(0);
+}
+
+function initRemix() {
+  $('#remixContentToggles input').prop('checked', false);
+  if (!data['output'].trimmedSequence) return;
+  initSequence($('[data-sequence-id=remix]'), data['output'].trimmedSequence);
+}
+
+function updateRemix() {
+  const contentPrograms = getSelectedPrograms($('#remixContentToggles :checked'));
+  const outputPrograms = getSelectedPrograms($('#remixOutputToggles :checked'));
+  const contentSeq = filterSequence(data['content'].trimmedSequence, contentPrograms);
+  const outputSeq = filterSequence(data['output'].trimmedSequence, outputPrograms);
+
+  // Create request
+  const formData = new FormData();
+  formData.append('content_sequence', new Blob([NoteSequence.encode(contentSeq).finish()]), 'content_sequence');
+  formData.append('output_sequence', new Blob([NoteSequence.encode(outputSeq).finish()]), 'output_sequence');
+
+  const section = $('.section[data-sequence-id=remix]');
+  setControlsEnabled(section, false);
+
+  fetch('/api/v1/remix/', {method: 'POST', body: formData})
+    .then((response) => response.arrayBuffer())
+    .then(function (buffer) {
+      // Decode the protobuffer
+      const seq = NoteSequence.decode(new Uint8Array(buffer));
+
+      // Assign a new filename based on the input filenames
+      seq.filename = outputSeq.filename.replace(/\.[^.]+$/, '') + '__remix.mid';
+
+      // Display the sequence
+      updateSequence('remix', seq);
+    })
+    .finally(() => setControlsEnabled(section, true));
+}
+
+function updateSequence(seqId, seq) {
   data[seqId].sequence = seq;
   data[seqId].visualizer.noteSequence = seq;
   data[seqId].visualizer.clear();
@@ -181,9 +241,12 @@ function handlePlaybackStop(button) {
 }
 
 function showMore(label) {
-  if (!$('.after-' + label).is(":visible")) {
-    $('.after-' + label).fadeIn('slow');
-    $('.after-' + label).last()[0].scrollIntoView({behavior: 'smooth'});
+  const elements = $('.after-' + label);
+  if (!elements.is(":visible")) {
+    elements.fadeIn(
+      'fast',
+      () => elements.filter('.visualizer-card')[0].scrollIntoView({behavior: 'smooth'})
+    );
   }
 }
 
@@ -196,12 +259,18 @@ function getSequencePrograms(sequence) {
   return Object.keys(programs).sort();
 }
 
+function getSelectedPrograms(checkboxes) {
+  return checkboxes.map((_, checkbox) => $(checkbox).val())
+    .map((_, p) => isNaN(p) ? p : parseInt(p))
+    .get();
+}
+
 function filterSequence(sequence, programs, inPlace) {
   const programsMap = {};
   programs.forEach((p) => {programsMap[p] = true;});
 
-  // Make a (shallow) copy if needed
-  const filtered = inPlace ? sequence : Object.assign({}, sequence);
+  // Make a copy if needed
+  const filtered = inPlace ? sequence : mm.sequences.clone(sequence);
   const notes = sequence.notes;
   filtered.notes = [];
   notes.forEach(function(note) {
@@ -210,4 +279,14 @@ function filterSequence(sequence, programs, inPlace) {
   });
 
   return filtered;
+}
+
+function mirrorControls(source, target) {
+  target.empty();
+  source.children().clone(true).appendTo(target);
+  target.find('input, button, select')
+    .attr('id', (_, id) => id + '_' + controlCount);
+  target.find('label')
+    .attr('for', (_, id) => id + '_' + controlCount);
+  controlCount++;
 }
