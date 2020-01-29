@@ -73,7 +73,11 @@ class BeatRelativeEncoding:
                 last_t = t
 
             if is_onset:
-                note_velocity_quantized = note.velocity // self._velocity_unit + 1
+                note_velocity = note.velocity
+                if note_velocity > 127 or note_velocity < 1:
+                    warnings.warn(f'Invalid velocity value: {note_velocity}')
+                    note_velocity = self._default_velocity
+                note_velocity_quantized = note_velocity // self._velocity_unit + 1
                 if velocity_quantized != note_velocity_quantized:
                     velocity_quantized = note_velocity_quantized
                     if self._use_velocity:
