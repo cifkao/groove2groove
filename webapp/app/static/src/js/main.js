@@ -171,13 +171,11 @@ function handleSequenceEdit() {
                             startTime * 60 / seq.tempos[0].qpm,
                             endTime * 60 / seq.tempos[0].qpm,
                             true);
-  } else {
-    seq = mm.sequences.clone(seq);
   }
   data[seqId].trimmedSequence = seq;
 
   const programs = getSelectedPrograms(section.find('.instrument-toggles :checked'));
-  filterSequence(seq, programs, true);  // filter in place
+  seq = filterSequence(seq, programs);
 
   updateSequence(seqId, seq);
 
