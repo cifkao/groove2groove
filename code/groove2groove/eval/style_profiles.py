@@ -16,7 +16,7 @@ from museflow.config import Configuration, configurable
 
 from groove2groove.eval import note_features
 
-_LOGGER = logging.getLogger('ocifka_phd')
+_LOGGER = logging.getLogger(__name__)
 
 
 def time_pitch_diff_hist(data, max_time=2, bin_size=1/6, pitch_range=20, normed=True,
