@@ -266,6 +266,7 @@ class NoteSequencePipeline(Loader):
         if self._warp and self._target_tempo:
             sequence, _ = sequences_lib.adjust_notesequence_times(
                 sequence, lambda t: t * 60. / self._target_tempo)
+            del sequence.tempos[:]
             sequence.tempos.add().qpm = self._target_tempo
         return sequence
 
