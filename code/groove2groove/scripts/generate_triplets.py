@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 import argparse
-import json
 import gzip
+import json
 import random
 
+from groove2groove.io import _build_segment_index, _build_style_index
 
-from groove2groove.io import _build_style_index, _build_segment_index
 
 def main():
     parser = argparse.ArgumentParser()
