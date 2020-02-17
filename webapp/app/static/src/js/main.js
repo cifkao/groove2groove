@@ -1,6 +1,6 @@
 import '../scss/main.scss';
 
-import { saveAs } from 'file-saver';
+import {saveAs} from 'file-saver';
 import * as mm from '@magenta/music/node/core';
 import {NoteSequence} from '@magenta/music/node/protobuf';
 
@@ -120,7 +120,7 @@ $('.generate-button').on('click', function() {
     .finally(() => setControlsEnabled(section, true));
 });
 
-function initSequence(section, seq) {
+function initSequence(section, seq, visualizerConfig) {
   const seqId = section.data('sequence-id');
   data[seqId].fullSequence = seq;
   data[seqId].trimmedSequence = seq;
@@ -128,7 +128,13 @@ function initSequence(section, seq) {
 
   // Show piano roll
   const svg = section.find('svg')[0];
-  data[seqId].visualizer = new mm.PianoRollSVGVisualizer(seq, svg, VISUALIZER_CONFIG);
+  if (visualizerConfig) {
+    // Override defaults with supplied values
+    visualizerConfig = Object.assign(Object.assign({}, VISUALIZER_CONFIG), visualizerConfig);
+  } else {
+    visualizerConfig = VISUALIZER_CONFIG;
+  }
+  data[seqId].visualizer = new mm.PianoRollSVGVisualizer(seq, svg, visualizerConfig);
   section.find('.visualizer-container').scrollLeft(0);
 
   if (seqId == 'remix')
@@ -192,7 +198,9 @@ function handleSequenceEdit() {
 function initRemix() {
   $('#remixContentToggles input').prop('checked', false);
   if (!data['output'].trimmedSequence) return;
-  initSequence($('[data-sequence-id=remix]'), data['output'].trimmedSequence);
+  initSequence($('[data-sequence-id=remix]'), data['output'].trimmedSequence,
+               {minPitch: Math.min(data['output'].visualizer.config.minPitch, data['content'].visualizer.config.minPitch),
+                maxPitch: Math.max(data['output'].visualizer.config.maxPitch, data['content'].visualizer.config.maxPitch)});
 }
 
 function updateRemix() {
