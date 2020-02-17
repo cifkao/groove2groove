@@ -107,6 +107,8 @@ $('.generate-button').on('click', function() {
   fetch('/api/v1/style_transfer/' + $('#modelName').val() + '/', {method: 'POST', body: formData})
     .then((response) => response.arrayBuffer())
     .then(function (buffer) {
+      stopAllPlayers();
+
       // Decode the protobuffer
       const seq = NoteSequence.decode(new Uint8Array(buffer));
 
