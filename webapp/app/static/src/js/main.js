@@ -15,6 +15,10 @@ const DRUMS = 'DRUMS';
 
 const data = {content: {}, style: {}, output: {}, remix: {}};
 
+$('.section[data-sequence-id]').each(function() {
+  data[$(this).data('sequence-id')].section = this;
+});
+
 var controlCount = 0;  // counter used for assigning IDs to dynamically created controls
 
 $('.after-content-loaded, .after-style-loaded, .after-generated').hide();
@@ -56,13 +60,15 @@ $('.play-button').on('click', function() {
       "https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus",
       undefined, null, null, {
         run: (note) => data[seqId].visualizer.redraw(note, true),
-        stop: () => handlePlaybackStop(this)
+        stop: () => handlePlaybackStop(seqId)
     });
 
   if (data[seqId].player.isPlaying()) {
     data[seqId].player.stop();
-    handlePlaybackStop(this);
+    handlePlaybackStop(seqId);
   } else {
+    stopAllPlayers();
+
     section.find('.visualizer-container').scrollLeft(0);
     data[seqId].player.start(data[seqId].sequence);
 
@@ -229,13 +235,24 @@ function setControlsEnabled(section, enabled) {
   section.find('input, button, select').attr('disabled', !enabled);
 }
 
-function handlePlaybackStop(button) {
-  $(button).find('.oi').removeClass("oi-media-stop").addClass("oi-media-play");
-  $(button).find('.text').text('Play');
-  $(button).attr('title', 'Play');
+function handlePlaybackStop(seqId) {
+  const section = $(data[seqId].section);
+  const button = section.find('.play-button');
 
-  const section = $(button).closest('[data-sequence-id]');
+  button.find('.oi').removeClass("oi-media-stop").addClass("oi-media-play");
+  button.find('.text').text('Play');
+  button.attr('title', 'Play');
+
   setControlsEnabled(section, true);
+}
+
+function stopAllPlayers() {
+  for (const seqId in data) {
+    if (data[seqId].player && data[seqId].player.isPlaying()) {
+      data[seqId].player.stop();
+      handlePlaybackStop(seqId);
+    }
+  }
 }
 
 function showMore(label) {
