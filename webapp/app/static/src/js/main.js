@@ -1,5 +1,6 @@
 import '../scss/main.scss';
 
+import 'bootstrap/js/dist/modal';
 import {saveAs} from 'file-saver';
 import * as mm from '@magenta/music/node/core';
 import {NoteSequence} from '@magenta/music/node/protobuf';
@@ -82,16 +83,23 @@ $('.play-button').on('click', function() {
     stopAllPlayers();
 
     section.find('.visualizer-container').scrollLeft(0);
-    data[seqId].player.start(data[seqId].sequence);
+    $('#loadingModal .loading-text').text('Loading sounds…');
+    $('#loadingModal').modal('show');
+    data[seqId].player.loadSamples(data[seqId].sequence)
+      .then(() => {
+        // Change button icon and text
+        $(this).find('.oi').removeClass("oi-media-play").addClass("oi-media-stop");
+        $(this).find('.text').text('Stop');
+        $(this).attr('title', 'Stop');
 
-    // Change button icon and text
-    $(this).find('.oi').removeClass("oi-media-play").addClass("oi-media-stop");
-    $(this).find('.text').text('Stop');
-    $(this).attr('title', 'Stop');
+        // Disable everything except for bottom controls
+        setControlsEnabled(section, false);
+        section.find('.card-footer button, .card-footer input').attr('disabled', false);
 
-    // Disable everything except for this button
-    setControlsEnabled(section, false);
-    $(this).attr('disabled', false);
+        // Start playback
+        data[seqId].player.start(data[seqId].sequence);
+      }).finally(() => $('#loadingModal').modal('hide'));
+
   }
 });
 
@@ -167,7 +175,7 @@ function initSequence(section, seq, visualizerConfig) {
     const controlId = 'checkbox' + (controlCount++);
     const label = program == DRUMS ? 'Drums' : INSTRUMENT_NAMES[program];
     const checkbox = $('<input type="checkbox" class="form-check-input" checked>')
-        .attr('id', controlId).val(program)
+        .attr('id', controlId).val(instrument)
         .on('change', handleSequenceEdit);
     $('<div class="form-check form-check-inline"></div>')
       .append(checkbox)
@@ -210,8 +218,8 @@ function handleSequenceEdit() {
   }
   data[seqId].trimmedSequence = seq;
 
-  const programs = getSelectedPrograms(section.find('.instrument-toggles :checked'));
-  seq = filterSequence(seq, programs);
+  const instruments = getSelectedInstruments(section.find('.instrument-toggles :checked'));
+  seq = filterSequence(seq, instruments);
 
   updateSequence(seqId, seq);
 
@@ -228,10 +236,10 @@ function initRemix() {
 }
 
 function updateRemix() {
-  const contentPrograms = getSelectedPrograms($('#remixContentToggles :checked'));
-  const outputPrograms = getSelectedPrograms($('#remixOutputToggles :checked'));
-  const contentSeq = filterSequence(data['content'].trimmedSequence, contentPrograms);
-  const outputSeq = filterSequence(data['output'].trimmedSequence, outputPrograms);
+  const contentInstruments = getSelectedInstruments($('#remixContentToggles :checked'));
+  const outputInstruments = getSelectedInstruments($('#remixOutputToggles :checked'));
+  const contentSeq = filterSequence(data['content'].trimmedSequence, contentInstruments);
+  const outputSeq = filterSequence(data['output'].trimmedSequence, outputInstruments);
 
   // Create request
   const formData = new FormData();
@@ -264,7 +272,7 @@ function updateSequence(seqId, seq) {
 }
 
 function setControlsEnabled(section, enabled) {
-  section.find('input, button, select').not('.tempo').attr('disabled', !enabled);
+  section.find('input, button, select').attr('disabled', !enabled);
 }
 
 function handlePlaybackStop(seqId) {
@@ -306,22 +314,22 @@ function getInstrumentPrograms(sequence) {
   return programs;
 }
 
-function getSelectedPrograms(checkboxes) {
+function getSelectedInstruments(checkboxes) {
   return checkboxes.map((_, checkbox) => $(checkbox).val())
     .map((_, p) => isNaN(p) ? p : parseInt(p))
     .get();
 }
 
-function filterSequence(sequence, programs, inPlace) {
-  const programsMap = {};
-  programs.forEach((p) => {programsMap[p] = true;});
+function filterSequence(sequence, instruments, inPlace) {
+  const instrumentMap = {};
+  instruments.forEach((i) => {instrumentMap[i] = true;});
 
   // Make a copy if needed
   const filtered = inPlace ? sequence : mm.sequences.clone(sequence);
   const notes = sequence.notes;
   filtered.notes = [];
   notes.forEach(function(note) {
-    if ((note.isDrum && programsMap[DRUMS]) || programsMap[note.program])
+    if ((note.isDrum && instrumentMap[DRUMS]) || instrumentMap[note.instrument])
       filtered.notes.push(note);
   });
 

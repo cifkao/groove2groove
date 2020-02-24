@@ -188,6 +188,16 @@
       </div>
     </div>
 
+    <div class="modal" id="loadingModal" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false" style="display: none;">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-body text-center">
+            <span class="spinner-border spinner-border-sm text-primary mr-2" role="status"></span><span class="loading-text text-primary">Loading&hellip;</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script src="{{ url_for('static', filename='bundle.js') }}"></script>
   </body>
 </html>
