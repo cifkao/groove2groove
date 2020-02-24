@@ -51,6 +51,15 @@ $('input.midi-input').on('change', function() {
 
 $('.start-time, .end-time').on('change', handleSequenceEdit);
 
+$('.tempo').on('change', function() {
+  const section = $(this).closest('[data-sequence-id]');
+  const seqId = section.data('sequence-id');
+
+  data[seqId].tempo = $(this).val();
+  if (data[seqId].player)
+    data[seqId].player.setTempo(data[seqId].tempo);
+});
+
 $('.play-button').on('click', function() {
   const section = $(this).closest('[data-sequence-id]');
   const seqId = section.data('sequence-id');
@@ -62,6 +71,9 @@ $('.play-button').on('click', function() {
         run: (note) => data[seqId].visualizer.redraw(note, true),
         stop: () => handlePlaybackStop(seqId)
     });
+
+  if (data[seqId].tempo)
+    data[seqId].player.setTempo(data[seqId].tempo);
 
   if (data[seqId].player.isPlaying()) {
     data[seqId].player.stop();
@@ -128,6 +140,13 @@ function initSequence(section, seq, visualizerConfig) {
   data[seqId].trimmedSequence = seq;
   data[seqId].sequence = seq;
 
+  if (seq.tempos && seq.tempos.length > 0 && seq.tempos[0].qpm > 0) {
+    data[seqId].tempo = Math.round((seq.tempos[0].qpm + Number.EPSILON) * 10) / 10;
+  } else {
+    data[seqId].tempo = mm.constants.DEFAULT_QUARTERS_PER_MINUTE;
+  }
+  section.find('.tempo').val(data[seqId].tempo);
+
   // Show piano roll
   const svg = section.find('svg')[0];
   if (visualizerConfig) {
@@ -144,15 +163,18 @@ function initSequence(section, seq, visualizerConfig) {
 
   // Add instrument checkboxes
   section.find('.instrument-toggles').empty();
-  getSequencePrograms(seq).forEach(function (program) {
+  Object.entries(getInstrumentPrograms(seq)).forEach(function ([instrument, program]) {
     const controlId = 'checkbox' + (controlCount++);
-    const instrument = program == DRUMS ? 'Drums' : INSTRUMENT_NAMES[program];
+    const label = program == DRUMS ? 'Drums' : INSTRUMENT_NAMES[program];
     const checkbox = $('<input type="checkbox" class="form-check-input" checked>')
         .attr('id', controlId).val(program)
         .on('change', handleSequenceEdit);
     $('<div class="form-check form-check-inline"></div>')
       .append(checkbox)
-      .append($('<label class="form-check-label"></label>').attr('for', controlId).text(instrument))
+      .append($('<label class="form-check-label"></label>')
+        .attr('for', controlId)
+        .attr('data-instrument', instrument)
+        .text(label))
       .appendTo(section.find('.instrument-toggles'));
   });
 
@@ -242,7 +264,7 @@ function updateSequence(seqId, seq) {
 }
 
 function setControlsEnabled(section, enabled) {
-  section.find('input, button, select').attr('disabled', !enabled);
+  section.find('input, button, select').not('.tempo').attr('disabled', !enabled);
 }
 
 function handlePlaybackStop(seqId) {
@@ -275,13 +297,13 @@ function showMore(label) {
   }
 }
 
-function getSequencePrograms(sequence) {
+function getInstrumentPrograms(sequence) {
   const programs = {};
   sequence.notes.forEach(function(note) {
     const program = note.isDrum ? DRUMS : note.program;
-    programs[program] = true;
+    programs[note.instrument] = program;
   });
-  return Object.keys(programs).sort();
+  return programs;
 }
 
 function getSelectedPrograms(checkboxes) {

@@ -2,6 +2,10 @@ $icon-font-path: "~open-iconic/font/fonts/";
 @import "~bootstrap/scss/bootstrap";
 @import "~open-iconic/font/css/open-iconic-bootstrap";
 
+
+$instrument-colors: $blue, $indigo, $purple, $pink, $red, $orange, $yellow, $green, $teal, $cyan;
+
+
 .section {
   margin-top: 2ex;
   margin-bottom: 2ex;
@@ -18,5 +22,34 @@ $icon-font-path: "~open-iconic/font/fonts/";
 
   .card-footer {
     padding: 0.7rem 0.9rem;
+  }
+}
+
+.tempo {
+  max-width: 6em;
+}
+
+label[data-instrument] {
+  border-bottom: 3px solid transparent;
+}
+
+svg {
+  rect[data-instrument] {
+    opacity: 0.7;
+  }
+
+  rect[data-instrument].active {
+    opacity: 0.9;
+    stroke: black;
+  }
+}
+
+@for $i from 0 to 200 {
+  $color: nth($instrument-colors, ($i % length($instrument-colors)) + 1);
+  label[data-instrument="#{$i}"] {
+    border-bottom-color: $color;
+  }
+  svg rect[data-instrument="#{$i}"] {
+    fill: $color;
   }
 }
