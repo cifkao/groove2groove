@@ -47,9 +47,9 @@ class Model:
                                                             input_size=len(vocabulary),
                                                             name='embedding_layer')
 
-        style_embeddings = self._cfg['embedding_layer'].configure(EmbeddingLayer,
-                                                                  input_size=len(style_vocabulary),
-                                                                  name='embedding_layer')
+        style_embeddings = self._cfg['style_embedding_layer'].configure(
+            EmbeddingLayer, input_size=len(style_vocabulary),
+            name='style_embedding_layer')
         self.style_vector = style_embeddings.embed(style_id)
 
         def cell_wrap_fn(cell):
