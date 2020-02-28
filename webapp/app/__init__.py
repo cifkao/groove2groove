@@ -72,8 +72,8 @@ def remix():
     del output_seq.tempos[:]  # to avoid having double tempo information in the result
 
     # Shift instrument IDs to avoid collisions
-    instrument_offset = max([0, *(x.instrument for x in [*output_seq.instrument_infos,
-                                                         *output_seq.notes])])
+    instrument_offset = max([-1, *(x.instrument for x in [*output_seq.instrument_infos,
+                                                          *output_seq.notes])]) + 1
     for collection in [content_seq.instrument_infos, content_seq.notes, content_seq.pitch_bends,
                        content_seq.control_changes]:
         for item in collection:

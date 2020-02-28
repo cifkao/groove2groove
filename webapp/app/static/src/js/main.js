@@ -166,12 +166,30 @@ function initSequence(section, seq, visualizerConfig) {
   data[seqId].visualizer = new mm.PianoRollSVGVisualizer(seq, svg, visualizerConfig);
   section.find('.visualizer-container').scrollLeft(0);
 
-  if (seqId == 'remix')
+  if (seqId == 'remix') {
+    const outputCheckboxes = addInstrumentCheckboxes(
+        section.find('#remixOutputToggles'), seq, seqId);
+    const contentCheckboxes = addInstrumentCheckboxes(
+        section.find('#remixContentToggles'), data['content'].trimmedSequence, seqId,
+        Math.max(0, ...outputCheckboxes.map((_, e) => e.value)) + 1);
+    contentCheckboxes.prop('checked', false);
     return;
+  }
 
-  // Add instrument checkboxes
-  section.find('.instrument-toggles').empty();
+  addInstrumentCheckboxes(section.find('.instrument-toggles'), seq, seqId);
+
+  // Update the remix section if needed
+  if (seqId == 'content' || seqId == 'output') {
+    initRemix();
+  }
+}
+
+function addInstrumentCheckboxes(parent, seq, seqId, instrumentOffset) {
+  instrumentOffset = instrumentOffset || 0;
+
+  parent.empty();
   Object.entries(getInstrumentPrograms(seq)).forEach(function ([instrument, program]) {
+    instrument = parseInt(instrument) + instrumentOffset;
     const controlId = 'checkbox' + (controlCount++);
     const label = program == DRUMS ? 'Drums' : INSTRUMENT_NAMES[program];
     const checkbox = $('<input type="checkbox" class="form-check-input" checked>')
@@ -185,31 +203,16 @@ function initSequence(section, seq, visualizerConfig) {
         .attr('for', controlId)
         .attr('data-instrument', instrument)
         .text(label))
-      .appendTo(section.find('.instrument-toggles'));
+      .appendTo(parent);
   });
-
-  // Update the remix section if needed
-  if (seqId == 'content' || seqId == 'output') {
-    if (seqId == 'content') {
-      mirrorControls(section.find('.instrument-toggles'), $('#remixContentToggles'), 'remix');
-    } else if (seqId == 'output') {
-      mirrorControls(section.find('.instrument-toggles'), $('#remixOutputToggles'), 'remix');
-    }
-
-    initRemix();
-  }
+  return parent.find('input');
 }
 
 function handleSequenceEdit() {
   const section = $(this).closest('[data-sequence-id]');
   const seqId = section.data('sequence-id');
-  if (seqId == 'remix') {
-    updateRemix();
-    return;
-  }
 
   var seq = data[seqId].fullSequence;
-
   const startTime = section.find('.start-time').val();
   const endTime = section.find('.end-time').val();
   if (startTime !== undefined && endTime !== undefined) {
@@ -231,29 +234,25 @@ function handleSequenceEdit() {
 }
 
 function initRemix() {
+  const section = $('.section[data-sequence-id=remix]');
+
   $('#remixContentToggles input').prop('checked', false);
   if (!data['output'].trimmedSequence) return;
-  initSequence($('[data-sequence-id=remix]'), data['output'].trimmedSequence,
+
+  // Initialize with the output only, but make sure the visualizer is tall enough
+  initSequence(section, data['output'].trimmedSequence,
                {minPitch: Math.min(data['output'].visualizer.config.minPitch, data['content'].visualizer.config.minPitch),
                 maxPitch: Math.max(data['output'].visualizer.config.maxPitch, data['content'].visualizer.config.maxPitch)});
-}
-
-function updateRemix() {
-  const contentInstruments = getSelectedInstruments($('#remixContentToggles :checked'));
-  const outputInstruments = getSelectedInstruments($('#remixOutputToggles :checked'));
-  const contentSeq = filterSequence(data['content'].trimmedSequence, contentInstruments);
-  const outputSeq = filterSequence(data['output'].trimmedSequence, outputInstruments);
-  data['remix'].selectedContentInstruments = contentInstruments;
-  data['remix'].selectedOutputInstruments = outputInstruments;
 
   // Create request
+  const contentSeq = data['content'].trimmedSequence;
+  const outputSeq = data['output'].trimmedSequence;
   const formData = new FormData();
   formData.append('content_sequence', new Blob([NoteSequence.encode(contentSeq).finish()]), 'content_sequence');
   formData.append('output_sequence', new Blob([NoteSequence.encode(outputSeq).finish()]), 'output_sequence');
 
-  const section = $('.section[data-sequence-id=remix]');
+  // Get the response
   setControlsEnabled(section, false);
-
   fetch('/api/v1/remix/', {method: 'POST', body: formData})
     .then((response) => response.arrayBuffer())
     .then(function (buffer) {
@@ -263,8 +262,7 @@ function updateRemix() {
       // Assign a new filename based on the input filenames
       seq.filename = outputSeq.filename.replace(/\.[^.]+$/, '') + '__remix.mid';
 
-      // Display the sequence
-      updateSequence('remix', seq);
+      data['remix'].fullSequence = data['remix'].trimmedSequence = seq;
     })
     .finally(() => setControlsEnabled(section, true));
 }
@@ -343,23 +341,12 @@ function filterSequence(sequence, instruments, inPlace) {
   return filtered;
 }
 
-function mirrorControls(source, target, nameSuffix) {
-  target.empty();
-  source.children().clone(true).appendTo(target);
-  target.find('input, button, select')
-    .attr('id', (_, id) => id + '_' + controlCount)
-    .attr('name', (_, name) => name + '_' + nameSuffix);
-  target.find('label')
-    .attr('for', (_, id) => id + '_' + controlCount);
-  controlCount++;
-}
-
 export function exportPreset() {
   const dataCopy = {};
   for (const seqId in data) {
     dataCopy[seqId] = {};
     for (const key in data[seqId]) {
-      if (!['player', 'visualizer', 'section'].includes(key)) {
+      if (!['player', 'visualizer', 'section', 'fullSequence'].includes(key)) {
         var value = data[seqId][key];
         if (value instanceof NoteSequence) {
           value = value.toJSON();
@@ -389,7 +376,7 @@ export function loadPreset(preset) {
       }
     }
 
-    initSequence($(data[seqId].section), presetData.fullSequence);
+    initSequence($(data[seqId].section), presetData.trimmedSequence);
     Object.assign(data[seqId], presetData);
   });
 
