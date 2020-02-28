@@ -69,9 +69,11 @@ def remix():
     # Assume that output_seq has a constant tempo; warp content_seq to match it
     if output_seq.tempos and content_seq.tempos:
         content_seq = normalize_tempo(content_seq, output_seq.tempos[0].qpm)
+    del output_seq.tempos[:]  # to avoid having double tempo information in the result
 
     # Shift instrument IDs to avoid collisions
-    instrument_offset = max([0, *(info.instrument for info in output_seq.instrument_infos)])
+    instrument_offset = max([0, *(x.instrument for x in [*output_seq.instrument_infos,
+                                                         *output_seq.notes])])
     for collection in [content_seq.instrument_infos, content_seq.notes, content_seq.pitch_bends,
                        content_seq.control_changes]:
         for item in collection:
