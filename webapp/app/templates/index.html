@@ -12,7 +12,7 @@
         <div class="row">
           <div class="input-group col-md-4 col-lg-6 mb-1 mb-md-0">
             <div class="custom-file">
-               <input id="contentFile" type="file" class="custom-file-input midi-input">
+               <input id="contentFile" name="contentFile" type="file" class="custom-file-input midi-input">
                <label for="contentFile" class="custom-file-label text-truncate">Choose MIDI file...</label>
             </div>
           </div>
@@ -20,13 +20,13 @@
             <div class="input-group-prepend">
               <label for="contentStartTime" class="input-group-text">Start beat</label>
             </div>
-            <input type="number" class="form-control start-time" id="contentStartTime" value="0" min="0" step="1">
+            <input type="number" class="form-control start-time" id="contentStartTime" name="contentStartTime" value="0" min="0" step="1">
           </div>
           <div class="input-group col-sm-6 col-md-4 col-lg-3 after-content-loaded">
             <div class="input-group-prepend">
               <label for="contentEndTime" class="input-group-text">End beat</label>
             </div>
-            <input type="number" class="form-control end-time" id="contentEndTime" min="0" step="1">
+            <input type="number" class="form-control end-time" id="contentEndTime" name="contentEndTime" min="0" step="1">
           </div>
         </div>
         <div class="card visualizer-card mt-2 after-content-loaded">
@@ -48,7 +48,7 @@
                 <div class="input-group-prepend">
                   <label for="contentTempo" class="input-group-text">Tempo</label>
                 </div>
-                <input type="number" class="form-control tempo" id="contentTempo" min="20" step="any" max="300" size="4">
+                <input type="number" class="form-control tempo" id="contentTempo" name="contentTempo" min="20" step="any" max="300" size="4">
               </div>
             </form>
           </div>
@@ -61,7 +61,7 @@
         <div class="row">
           <div class="input-group col-md-4 col-lg-6 mb-1 mb-md-0">
             <div class="custom-file">
-               <input id="styleFile" type="file" class="custom-file-input midi-input">
+               <input id="styleFile" name="styleFile" type="file" class="custom-file-input midi-input">
                <label for="styleFile" class="custom-file-label text-truncate">Choose MIDI file...</label>
             </div>
           </div>
@@ -69,13 +69,13 @@
             <div class="input-group-prepend">
               <label for="styleStartTime" class="input-group-text">Start beat</label>
             </div>
-            <input type="number" class="form-control start-time" id="styleStartTime" value="0" min="0" step="1">
+            <input type="number" class="form-control start-time" id="styleStartTime" name="styleStartTime" value="0" min="0" step="1">
           </div>
           <div class="input-group col-sm-6 col-md-4 col-lg-3 after-style-loaded">
             <div class="input-group-prepend">
               <label for="styleEndTime" class="input-group-text">End beat</label>
             </div>
-            <input type="number" class="form-control end-time" id="styleEndTime" min="0" step="1">
+            <input type="number" class="form-control end-time" id="styleEndTime" name="styleEndTime" min="0" step="1">
           </div>
         </div>
         <div class="card visualizer-card mt-2 after-style-loaded">
@@ -95,9 +95,9 @@
               <button type="button" class="btn btn-primary mr-2 save-button"><span class="oi oi-data-transfer-download" title="Save" aria-hidden="true"></span> Save</button>
               <div class="input-group ml-auto">
                 <div class="input-group-prepend">
-                  <label for="contentTempo" class="input-group-text">Tempo</label>
+                  <label for="styleTempo" class="input-group-text">Tempo</label>
                 </div>
-                <input type="number" class="form-control tempo" id="contentTempo" min="20" step="any" max="300" size="4">
+                <input type="number" class="form-control tempo" id="styleTempo" name="styleTempo" min="20" step="any" max="300" size="4">
               </div>
             </form>
           </div>
@@ -112,9 +112,9 @@
                 Model
               </div>
             </div>
-            <select class="form-control" id="modelName">
+            <select class="form-control" id="modelName" name="modelName">
               {% for model_name, model_cfg in config.MODELS.items() %}
-              <option value="{{ model_name }}">{{ model_name }}</option>
+              <option value="{{ model_name }}">{{ model_cfg['label'] }}</option>
               {% endfor %}
             </select>
           </div>
@@ -124,14 +124,14 @@
             </div>
             <div class="input-group-prepend input-group-append">
               <div class="input-group-text">
-                <input type="checkbox" id="samplingCheckbox" checked>
+                <input type="checkbox" id="samplingCheckbox" name="samplingCheckbox" checked>
                 <label for="samplingCheckbox" class="ml-1 mb-0">Sample with temperature:</label>
               </div>
             </div>
-            <input type="number" class="form-control" id="samplingTemperature" value="0.6" min="0.0" step="0.1" style="max-width: 4.5em">
+            <input type="number" class="form-control" id="samplingTemperature" name="samplingTemperature" value="0.6" min="0.0" step="0.1" style="max-width: 4.5em">
           </div>
         </form>
-        <div class="card visualizer-card mt-2 after-generated">
+        <div class="card visualizer-card mt-2 after-output-loaded">
           <div class="card-header">
             <div class="d-flex flex-row">
               <div class="p-2">Instruments:</div>
@@ -147,18 +147,18 @@
               <button type="button" class="btn btn-primary mr-2 save-button"><span class="oi oi-data-transfer-download" title="Save" aria-hidden="true"></span> Save</button>
               <div class="input-group ml-auto">
                 <div class="input-group-prepend">
-                  <label for="contentTempo" class="input-group-text">Tempo</label>
+                  <label for="outputTempo" class="input-group-text">Tempo</label>
                 </div>
-                <input type="number" class="form-control tempo" id="contentTempo" min="20" step="any" max="300" size="4">
+                <input type="number" class="form-control tempo" id="outputTempo" name="outputTempo" min="20" step="any" max="300" size="4">
               </div>
             </form>
           </div>
         </div>
       </div>
-      <div class="section after-generated" data-sequence-id="remix">
+      <div class="section after-output-loaded" data-sequence-id="remix">
         <h2>Remix</h2>
         <p>Now add some of the original tracks (e.g.&nbsp;melody) and listen to the mix!</p>
-        <div class="card visualizer-card mt-2 after-generated">
+        <div class="card visualizer-card mt-2 after-output-loaded">
           <div class="card-header">
             <div class="d-flex flex-row">
               <div class="p-2">Output:</div>
@@ -178,9 +178,9 @@
               <button type="button" class="btn btn-primary mr-2 save-button"><span class="oi oi-data-transfer-download" title="Save" aria-hidden="true"></span> Save</button>
               <div class="input-group ml-auto">
                 <div class="input-group-prepend">
-                  <label for="contentTempo" class="input-group-text">Tempo</label>
+                  <label for="remixTempo" class="input-group-text">Tempo</label>
                 </div>
-                <input type="number" class="form-control tempo" id="contentTempo" min="20" step="any" max="300" size="4">
+                <input type="number" class="form-control tempo" id="remixTempo" name="remixTempo" min="20" step="any" max="300" size="4">
               </div>
             </form>
           </div>

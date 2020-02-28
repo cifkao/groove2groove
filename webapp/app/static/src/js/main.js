@@ -22,7 +22,7 @@ $('.section[data-sequence-id]').each(function() {
 
 var controlCount = 0;  // counter used for assigning IDs to dynamically created controls
 
-$('.after-content-loaded, .after-style-loaded, .after-generated').hide();
+$('.after-content-loaded, .after-style-loaded, .after-output-loaded').hide();
 $('.container').fadeIn('fast');
 
 $('input.midi-input').on('change', function() {
@@ -42,9 +42,9 @@ $('input.midi-input').on('change', function() {
 
     const maxTime = Math.ceil(seq.totalTime / 60 * seq.tempos[0].qpm);
     section.find('.start-time').val(0);
-    section.find('.start-time').attr('max', maxTime - 1);
+    section.find('.start-time').prop('max', maxTime - 1);
     section.find('.end-time').val(maxTime);
-    section.find('.end-time').attr('max', maxTime);
+    section.find('.end-time').prop('max', maxTime);
 
     showMore(seqId + '-loaded');
   }).finally(() => setControlsEnabled(section, true));
@@ -90,11 +90,11 @@ $('.play-button').on('click', function() {
         // Change button icon and text
         $(this).find('.oi').removeClass("oi-media-play").addClass("oi-media-stop");
         $(this).find('.text').text('Stop');
-        $(this).attr('title', 'Stop');
+        $(this).prop('title', 'Stop');
 
         // Disable everything except for bottom controls
         setControlsEnabled(section, false);
-        section.find('.card-footer button, .card-footer input').attr('disabled', false);
+        section.find('.card-footer button, .card-footer input').prop('disabled', false);
 
         // Start playback
         data[seqId].player.start(data[seqId].sequence);
@@ -137,7 +137,7 @@ $('.generate-button').on('click', function() {
 
       // Display the sequence
       initSequence(section, seq);
-      showMore('generated');
+      showMore('output-loaded');
     })
     .finally(() => setControlsEnabled(section, true));
 });
@@ -175,7 +175,9 @@ function initSequence(section, seq, visualizerConfig) {
     const controlId = 'checkbox' + (controlCount++);
     const label = program == DRUMS ? 'Drums' : INSTRUMENT_NAMES[program];
     const checkbox = $('<input type="checkbox" class="form-check-input" checked>')
-        .attr('id', controlId).val(instrument)
+        .attr('id', controlId)
+        .attr('name', seqId + 'Instrument' + instrument)
+        .val(instrument)
         .on('change', handleSequenceEdit);
     $('<div class="form-check form-check-inline"></div>')
       .append(checkbox)
@@ -189,9 +191,9 @@ function initSequence(section, seq, visualizerConfig) {
   // Update the remix section if needed
   if (seqId == 'content' || seqId == 'output') {
     if (seqId == 'content') {
-      mirrorControls(section.find('.instrument-toggles'), $('#remixContentToggles'));
+      mirrorControls(section.find('.instrument-toggles'), $('#remixContentToggles'), 'remix');
     } else if (seqId == 'output') {
-      mirrorControls(section.find('.instrument-toggles'), $('#remixOutputToggles'));
+      mirrorControls(section.find('.instrument-toggles'), $('#remixOutputToggles'), 'remix');
     }
 
     initRemix();
@@ -219,6 +221,7 @@ function handleSequenceEdit() {
   data[seqId].trimmedSequence = seq;
 
   const instruments = getSelectedInstruments(section.find('.instrument-toggles :checked'));
+  data[seqId].selectedInstruments = instruments;
   seq = filterSequence(seq, instruments);
 
   updateSequence(seqId, seq);
@@ -240,6 +243,8 @@ function updateRemix() {
   const outputInstruments = getSelectedInstruments($('#remixOutputToggles :checked'));
   const contentSeq = filterSequence(data['content'].trimmedSequence, contentInstruments);
   const outputSeq = filterSequence(data['output'].trimmedSequence, outputInstruments);
+  data['remix'].selectedContentInstruments = contentInstruments;
+  data['remix'].selectedOutputInstruments = outputInstruments;
 
   // Create request
   const formData = new FormData();
@@ -272,7 +277,9 @@ function updateSequence(seqId, seq) {
 }
 
 function setControlsEnabled(section, enabled) {
-  section.find('input, button, select').attr('disabled', !enabled);
+  section.find('input, button, select')
+         .filter((_, e) => $(e).data('no-enable') === undefined)
+         .prop('disabled', !enabled);
 }
 
 function handlePlaybackStop(seqId) {
@@ -281,7 +288,7 @@ function handlePlaybackStop(seqId) {
 
   button.find('.oi').removeClass("oi-media-stop").addClass("oi-media-play");
   button.find('.text').text('Play');
-  button.attr('title', 'Play');
+  button.prop('title', 'Play');
 
   setControlsEnabled(section, true);
 }
@@ -336,12 +343,71 @@ function filterSequence(sequence, instruments, inPlace) {
   return filtered;
 }
 
-function mirrorControls(source, target) {
+function mirrorControls(source, target, nameSuffix) {
   target.empty();
   source.children().clone(true).appendTo(target);
   target.find('input, button, select')
-    .attr('id', (_, id) => id + '_' + controlCount);
+    .attr('id', (_, id) => id + '_' + controlCount)
+    .attr('name', (_, name) => name + '_' + nameSuffix);
   target.find('label')
     .attr('for', (_, id) => id + '_' + controlCount);
   controlCount++;
+}
+
+export function exportPreset() {
+  const dataCopy = {};
+  for (const seqId in data) {
+    dataCopy[seqId] = {};
+    for (const key in data[seqId]) {
+      if (!['player', 'visualizer', 'section'].includes(key)) {
+        var value = data[seqId][key];
+        if (value instanceof NoteSequence) {
+          value = value.toJSON();
+        }
+        dataCopy[seqId][key] = value;
+      }
+    }
+  }
+  return JSON.stringify({
+    data: dataCopy,
+    controls: $('input, select').serializeArray()
+  });
+}
+
+export function loadPreset(preset) {
+  // Make sure things are loaded in the correct order
+  const seqIds = ['content', 'style', 'output', 'remix'];
+
+  // Load full sequence data
+  seqIds.forEach((seqId) => {
+    // Convert NoteSequences from JSON
+    const presetData = {};
+    for (const key in preset.data[seqId]) {
+      presetData[key] = preset.data[seqId][key];
+      if (presetData[key].notes) {
+        presetData[key] = NoteSequence.fromObject(presetData[key]);
+      }
+    }
+
+    initSequence($(data[seqId].section), presetData.fullSequence);
+    Object.assign(data[seqId], presetData);
+  });
+
+  // Restore control states
+  $('input[type="radio"], input[type="checkbox"]').prop('checked', false);
+  preset.controls.forEach((ctrl) => {
+    document.getElementsByName(ctrl.name).forEach((e) => {
+      if (['radio', 'checkbox'].includes(e.type)) {
+        e.checked = true;
+      } else {
+        e.value = ctrl.value;
+      }
+    });
+  });
+
+  // Load the edited (filtered & remixed) sequences
+  seqIds.forEach((seqId) => {
+    updateSequence(seqId, data[seqId].sequence);
+    showMore(seqId + '-loaded');
+  });
 }
