@@ -5,9 +5,11 @@ import {saveAs} from 'file-saver';
 import * as mm from '@magenta/music/node/core';
 import {NoteSequence} from '@magenta/music/node/protobuf';
 
+
 const VISUALIZER_CONFIG = {
   pixelsPerTimeStep: 40,
   noteHeight: 4,
+  noteSpacing: 0.5  // workaround for visualizer bug (#421)
 };
 const INSTRUMENT_NAMES = [
   "Acoustic Grand Piano", "Bright Acoustic Piano", "Electric Grand Piano", "Honky-tonk Piano", "Electric Piano 1", "Electric Piano 2", "Harpsichord", "Clavinet", "Celesta", "Glockenspiel", "Music Box", "Vibraphone", "Marimba", "Xylophone", "Tubular Bells", "Dulcimer", "Drawbar Organ", "Percussive Organ", "Rock Organ", "Church Organ", "Reed Organ", "Accordion", "Harmonica", "Tango Accordion", "Acoustic Guitar (nylon)", "Acoustic Guitar (steel)", "Electric Guitar (jazz)", "Electric Guitar (clean)", "Electric Guitar (muted)", "Overdriven Guitar", "Distortion Guitar", "Guitar Harmonics", "Acoustic Bass", "Electric Bass (finger)", "Electric Bass (pick)", "Fretless Bass", "Slap Bass 1", "Slap Bass 2", "Synth Bass 1", "Synth Bass 2", "Violin", "Viola", "Cello", "Contrabass", "Tremolo Strings", "Pizzicato Strings", "Orchestral Harp", "Timpani", "String Ensemble 1", "String Ensemble 2", "Synth Strings 1", "Synth Strings 2", "Choir Aahs", "Voice Oohs", "Synth Choir", "Orchestra Hit", "Trumpet", "Trombone", "Tuba", "Muted Trumpet", "French Horn", "Brass Section", "Synth Brass 1", "Synth Brass 2", "Soprano Sax", "Alto Sax", "Tenor Sax", "Baritone Sax", "Oboe", "English Horn", "Bassoon", "Clarinet", "Piccolo", "Flute", "Recorder", "Pan Flute", "Blown bottle", "Shakuhachi", "Whistle", "Ocarina", "Lead 1 (square)", "Lead 2 (sawtooth)", "Lead 3 (calliope)", "Lead 4 chiff", "Lead 5 (charang)", "Lead 6 (voice)", "Lead 7 (fifths)", "Lead 8 (bass + lead)", "Pad 1 (new age)", "Pad 2 (warm)", "Pad 3 (polysynth)", "Pad 4 (choir)", "Pad 5 (bowed)", "Pad 6 (metallic)", "Pad 7 (halo)", "Pad 8 (sweep)", "FX 1 (rain)", "FX 2 (soundtrack)", "FX 3 (crystal)", "FX 4 (atmosphere)", "FX 5 (brightness)", "FX 6 (goblins)", "FX 7 (echoes)", "FX 8 (sci-fi)", "Sitar", "Banjo", "Shamisen", "Koto", "Kalimba", "Bagpipe", "Fiddle", "Shanai", "Tinkle Bell", "Agogo", "Steel Drums", "Woodblock", "Taiko Drum", "Melodic Tom", "Synth Drum", "Reverse Cymbal", "Guitar Fret Noise", "Breath Noise", "Seashore", "Bird Tweet", "Telephone Ring", "Helicopter", "Applause", "Gunshot"
@@ -142,9 +144,15 @@ $('.generate-button').on('click', function() {
     .finally(() => setControlsEnabled(section, true));
 });
 
-function initSequence(section, seq, visualizerConfig) {
+$('#savePreset').on('click', function() {
+  saveAs(new File([exportPreset()], data['output'].sequence.filename.replace(/\.mid$/, '.json')));
+});
+
+function initSequence(section, seq, visualizerConfig, staticMode) {
   const seqId = section.data('sequence-id');
-  data[seqId].fullSequence = seq;
+  if (!staticMode) {
+    data[seqId].fullSequence = seq;
+  }
   data[seqId].trimmedSequence = seq;
   data[seqId].sequence = seq;
 
@@ -180,7 +188,7 @@ function initSequence(section, seq, visualizerConfig) {
 
   // Update the remix section if needed
   if (seqId == 'content' || seqId == 'output') {
-    initRemix();
+    initRemix(staticMode);
   }
 }
 
@@ -213,15 +221,20 @@ function handleSequenceEdit() {
   const seqId = section.data('sequence-id');
 
   var seq = data[seqId].fullSequence;
-  const startTime = section.find('.start-time').val();
-  const endTime = section.find('.end-time').val();
-  if (startTime !== undefined && endTime !== undefined) {
-    seq = mm.sequences.trim(seq,
-                            startTime * 60 / seq.tempos[0].qpm,
-                            endTime * 60 / seq.tempos[0].qpm,
-                            true);
+  if (seq) {
+    const startTime = section.find('.start-time').val();
+    const endTime = section.find('.end-time').val();
+    if (startTime !== undefined && endTime !== undefined) {
+      seq = mm.sequences.trim(seq,
+                              startTime * 60 / seq.tempos[0].qpm,
+                              endTime * 60 / seq.tempos[0].qpm,
+                              true);
+    }
+    data[seqId].trimmedSequence = seq;
+  } else {
+    // There might be no fullSequence if the data was loaded from a preset
+    seq = data[seqId].trimmedSequence;
   }
-  data[seqId].trimmedSequence = seq;
 
   const instruments = getSelectedInstruments(section.find('.instrument-toggles :checked'));
   data[seqId].selectedInstruments = instruments;
@@ -233,7 +246,7 @@ function handleSequenceEdit() {
     section.find('.visualizer-container').scrollLeft(0);
 }
 
-function initRemix() {
+function initRemix(staticMode) {
   const section = $('.section[data-sequence-id=remix]');
 
   $('#remixContentToggles input').prop('checked', false);
@@ -242,29 +255,32 @@ function initRemix() {
   // Initialize with the output only, but make sure the visualizer is tall enough
   initSequence(section, data['output'].trimmedSequence,
                {minPitch: Math.min(data['output'].visualizer.config.minPitch, data['content'].visualizer.config.minPitch),
-                maxPitch: Math.max(data['output'].visualizer.config.maxPitch, data['content'].visualizer.config.maxPitch)});
+                maxPitch: Math.max(data['output'].visualizer.config.maxPitch, data['content'].visualizer.config.maxPitch)},
+               staticMode);
 
-  // Create request
-  const contentSeq = data['content'].trimmedSequence;
-  const outputSeq = data['output'].trimmedSequence;
-  const formData = new FormData();
-  formData.append('content_sequence', new Blob([NoteSequence.encode(contentSeq).finish()]), 'content_sequence');
-  formData.append('output_sequence', new Blob([NoteSequence.encode(outputSeq).finish()]), 'output_sequence');
+  if (!staticMode) {
+    // Create request
+    const contentSeq = data['content'].trimmedSequence;
+    const outputSeq = data['output'].trimmedSequence;
+    const formData = new FormData();
+    formData.append('content_sequence', new Blob([NoteSequence.encode(contentSeq).finish()]), 'content_sequence');
+    formData.append('output_sequence', new Blob([NoteSequence.encode(outputSeq).finish()]), 'output_sequence');
 
-  // Get the response
-  setControlsEnabled(section, false);
-  fetch('/api/v1/remix/', {method: 'POST', body: formData})
-    .then((response) => response.arrayBuffer())
-    .then(function (buffer) {
-      // Decode the protobuffer
-      const seq = NoteSequence.decode(new Uint8Array(buffer));
+    // Get the response
+    setControlsEnabled(section, false);
+    fetch('/api/v1/remix/', {method: 'POST', body: formData})
+      .then((response) => response.arrayBuffer())
+      .then(function (buffer) {
+        // Decode the protobuffer
+        const seq = NoteSequence.decode(new Uint8Array(buffer));
 
-      // Assign a new filename based on the input filenames
-      seq.filename = outputSeq.filename.replace(/\.[^.]+$/, '') + '__remix.mid';
+        // Assign a new filename based on the input filenames
+        seq.filename = outputSeq.filename.replace(/\.[^.]+$/, '') + '__remix.mid';
 
-      data['remix'].fullSequence = data['remix'].trimmedSequence = seq;
-    })
-    .finally(() => setControlsEnabled(section, true));
+        data['remix'].fullSequence = data['remix'].trimmedSequence = seq;
+      })
+      .finally(() => setControlsEnabled(section, true));
+  }
 }
 
 function updateSequence(seqId, seq) {
@@ -305,8 +321,9 @@ function showMore(label) {
   if (!elements.is(":visible")) {
     elements.fadeIn(
       'fast',
-      () => elements.filter('.visualizer-card')[0].scrollIntoView({behavior: 'smooth'})
-    );
+      () => elements.filter('.visualizer-card').first().each(() => {
+        this.scrollIntoView({behavior: 'smooth'});
+      }));
   }
 }
 
@@ -376,7 +393,11 @@ export function loadPreset(preset) {
       }
     }
 
-    initSequence($(data[seqId].section), presetData.trimmedSequence);
+    if (seqId == 'remix') {
+      initRemix(true);
+    } else {
+      initSequence($(data[seqId].section), presetData.trimmedSequence, undefined, true);
+    }
     Object.assign(data[seqId], presetData);
   });
 
