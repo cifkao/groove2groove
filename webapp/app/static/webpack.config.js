@@ -1,4 +1,5 @@
 const webpack = require('webpack');
+const CopyPlugin = require('copy-webpack-plugin');
 
 const config = {
   devtool: 'eval-source-map',
@@ -6,6 +7,8 @@ const config = {
   output:{
     path: __dirname + '/dist',
     filename: 'bundle.js',
+    library: 'main',
+    libraryTarget: 'window',
   },
   resolve: {
     extensions: ['.js', '.css']
@@ -14,7 +17,10 @@ const config = {
     new webpack.ProvidePlugin({
       $: "jquery",
       jQuery: "jquery"
-    })
+    }),
+    new CopyPlugin([
+      { from: 'src/presets', to: 'presets', test: /\.json$/ }
+    ])
   ],
   module: {
     rules: [

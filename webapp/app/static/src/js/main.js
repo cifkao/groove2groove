@@ -5,11 +5,12 @@ import {saveAs} from 'file-saver';
 import * as mm from '@magenta/music/node/core';
 import {NoteSequence} from '@magenta/music/node/protobuf';
 
+window.$ = window.jQuery = jQuery;
+
 
 const VISUALIZER_CONFIG = {
   pixelsPerTimeStep: 40,
   noteHeight: 4,
-  noteSpacing: 0.5  // workaround for visualizer bug (#421)
 };
 const INSTRUMENT_NAMES = [
   "Acoustic Grand Piano", "Bright Acoustic Piano", "Electric Grand Piano", "Honky-tonk Piano", "Electric Piano 1", "Electric Piano 2", "Harpsichord", "Clavinet", "Celesta", "Glockenspiel", "Music Box", "Vibraphone", "Marimba", "Xylophone", "Tubular Bells", "Dulcimer", "Drawbar Organ", "Percussive Organ", "Rock Organ", "Church Organ", "Reed Organ", "Accordion", "Harmonica", "Tango Accordion", "Acoustic Guitar (nylon)", "Acoustic Guitar (steel)", "Electric Guitar (jazz)", "Electric Guitar (clean)", "Electric Guitar (muted)", "Overdriven Guitar", "Distortion Guitar", "Guitar Harmonics", "Acoustic Bass", "Electric Bass (finger)", "Electric Bass (pick)", "Fretless Bass", "Slap Bass 1", "Slap Bass 2", "Synth Bass 1", "Synth Bass 2", "Violin", "Viola", "Cello", "Contrabass", "Tremolo Strings", "Pizzicato Strings", "Orchestral Harp", "Timpani", "String Ensemble 1", "String Ensemble 2", "Synth Strings 1", "Synth Strings 2", "Choir Aahs", "Voice Oohs", "Synth Choir", "Orchestra Hit", "Trumpet", "Trombone", "Tuba", "Muted Trumpet", "French Horn", "Brass Section", "Synth Brass 1", "Synth Brass 2", "Soprano Sax", "Alto Sax", "Tenor Sax", "Baritone Sax", "Oboe", "English Horn", "Bassoon", "Clarinet", "Piccolo", "Flute", "Recorder", "Pan Flute", "Blown bottle", "Shakuhachi", "Whistle", "Ocarina", "Lead 1 (square)", "Lead 2 (sawtooth)", "Lead 3 (calliope)", "Lead 4 chiff", "Lead 5 (charang)", "Lead 6 (voice)", "Lead 7 (fifths)", "Lead 8 (bass + lead)", "Pad 1 (new age)", "Pad 2 (warm)", "Pad 3 (polysynth)", "Pad 4 (choir)", "Pad 5 (bowed)", "Pad 6 (metallic)", "Pad 7 (halo)", "Pad 8 (sweep)", "FX 1 (rain)", "FX 2 (soundtrack)", "FX 3 (crystal)", "FX 4 (atmosphere)", "FX 5 (brightness)", "FX 6 (goblins)", "FX 7 (echoes)", "FX 8 (sci-fi)", "Sitar", "Banjo", "Shamisen", "Koto", "Kalimba", "Bagpipe", "Fiddle", "Shanai", "Tinkle Bell", "Agogo", "Steel Drums", "Woodblock", "Taiko Drum", "Melodic Tom", "Synth Drum", "Reverse Cymbal", "Guitar Fret Noise", "Breath Noise", "Seashore", "Bird Tweet", "Telephone Ring", "Helicopter", "Applause", "Gunshot"
@@ -17,12 +18,13 @@ const INSTRUMENT_NAMES = [
 const DRUMS = 'DRUMS';
 
 const data = {content: {}, style: {}, output: {}, remix: {}};
+var controlCount = 0;  // counter used for assigning IDs to dynamically created controls
 
 $('.section[data-sequence-id]').each(function() {
   data[$(this).data('sequence-id')].section = this;
 });
 
-var controlCount = 0;  // counter used for assigning IDs to dynamically created controls
+$('form').submit(function(e){ e.preventDefault(); });
 
 $('.after-content-loaded, .after-style-loaded, .after-output-loaded').hide();
 $('.container').fadeIn('fast');
@@ -71,7 +73,10 @@ $('.play-button').on('click', function() {
     data[seqId].player = new mm.SoundFontPlayer(
       "https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus",
       undefined, null, null, {
-        run: (note) => data[seqId].visualizer.redraw(note, true),
+        run: (note) => {
+          data[seqId].visualizer.redraw(note, true);
+          section.find('.seek-slider').val(note.startTime);
+        },
         stop: () => handlePlaybackStop(seqId)
     });
 
@@ -85,12 +90,13 @@ $('.play-button').on('click', function() {
     stopAllPlayers();
 
     section.find('.visualizer-container').scrollLeft(0);
+    section.find('.seek-slider').prop('max', data[seqId].sequence.totalTime).val(0);
     $('#loadingModal .loading-text').text('Loading sounds…');
     $('#loadingModal').modal('show');
     data[seqId].player.loadSamples(data[seqId].sequence)
       .then(() => {
         // Change button icon and text
-        $(this).find('.oi').removeClass("oi-media-play").addClass("oi-media-stop");
+        $(this).find('.oi').removeClass('oi-media-play').addClass('oi-media-stop');
         $(this).find('.text').text('Stop');
         $(this).prop('title', 'Stop');
 
@@ -101,8 +107,16 @@ $('.play-button').on('click', function() {
         // Start playback
         data[seqId].player.start(data[seqId].sequence);
       }).finally(() => $('#loadingModal').modal('hide'));
-
   }
+});
+
+$('.seek-slider').on('input', function() {
+  const section = $(this).closest('[data-sequence-id]');
+  const seqId = section.data('sequence-id');
+
+  data[seqId].player.pause();
+  data[seqId].player.seekTo($(this).val());
+  data[seqId].player.resume();
 });
 
 $('.save-button').on('click', function() {
@@ -305,9 +319,10 @@ function handlePlaybackStop(seqId) {
   button.prop('title', 'Play');
 
   setControlsEnabled(section, true);
+  section.find('.seek-slider').prop('disabled', true);
 }
 
-function stopAllPlayers() {
+export function stopAllPlayers() {
   for (const seqId in data) {
     if (data[seqId].player && data[seqId].player.isPlaying()) {
       data[seqId].player.stop();
@@ -321,9 +336,12 @@ function showMore(label) {
   if (!elements.is(":visible")) {
     elements.fadeIn(
       'fast',
-      () => elements.filter('.visualizer-card').first().each(() => {
-        this.scrollIntoView({behavior: 'smooth'});
-      }));
+      () => {
+        elements.find('.seek-slider').prop('disabled', true);  // Workaround for Bootstrap range
+        elements.filter('.visualizer-card').first().each((_, e) => {
+          e.scrollIntoView({behavior: 'smooth'});
+        });
+      });
   }
 }
 

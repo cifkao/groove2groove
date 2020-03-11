@@ -23,7 +23,7 @@
     "webpack-cli": "^3.3.10"
   },
   "dependencies": {
-    "@magenta/music": "^1.13.0",
+    "@magenta/music": "^1.14.0",
     "bootstrap": "^4.4.1",
     "file-saver": "^2.0.2",
     "jquery": "^3.4.1",
