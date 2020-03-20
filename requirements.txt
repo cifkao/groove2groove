@@ -1,5 +1,6 @@
 cached-property==1.5.1
 coloredlogs==10.0
+confugue==0.0.1
 lmdb==0.98
 magenta.music @ git+https://github.com/cifkao/magenta@magenta.music
 museflow @ git+https://github.com/cifkao/museflow@master

@@ -2,9 +2,9 @@ import io
 import os
 import threading
 
+from confugue import Configuration
 import flask
 from magenta.music.protobuf.music_pb2 import NoteSequence
-from museflow.config import Configuration
 from museflow.note_sequence_utils import normalize_tempo
 import tensorflow as tf
 

@@ -1,13 +1,13 @@
 import logging
 
 import tensorflow as tf
+from confugue import configurable
 from museflow.components import Component, using_scope
-from museflow.config import configurable
 
 _LOGGER = logging.getLogger(__name__)
 
 
-@configurable(['2d_layers', '1d_layers'])
+@configurable
 class CNN(Component):
 
     def __init__(self, training=None, name='cnn'):

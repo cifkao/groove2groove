@@ -10,9 +10,9 @@ import sys
 import coloredlogs
 import lmdb
 import numpy as np
+from confugue import Configuration, configurable
 from magenta.music.protobuf.music_pb2 import NoteSequence
 from museflow import note_sequence_utils
-from museflow.config import Configuration, configurable
 
 from groove2groove.eval import note_features
 
@@ -82,19 +82,19 @@ NOTE_STAT_DEFS = [
 ]
 
 
-@configurable(['features', 'stats'])
-def extract_note_stats(cfg, data):
-    features = {key: cfg['features'][key].configure(feat_type, **kwargs)
+@configurable
+def extract_note_stats(data, *, _cfg):
+    features = {key: _cfg['features'][key].configure(feat_type, **kwargs)
                 for key, (feat_type, kwargs) in NOTE_FEATURE_DEFS.items()}
     feature_values = note_features.extract_features(data, features)
 
-    @configurable(['features'])
-    def make_hist(cfg, name, normed=True):
-        feature_names = [f['name'] for f in cfg.get('features')]
+    @configurable
+    def make_hist(name, normed=True, *, _cfg):
+        feature_names = [f['name'] for f in _cfg.get('features')]
         with np.errstate(divide='ignore', invalid='ignore'):
             hist, _ = np.histogramdd(
                 sample=[feature_values[name] for name in feature_names],
-                bins=[cfg['features'][i]['bins'].configure(features[name].get_bins)
+                bins=[_cfg['features'][i]['bins'].configure(features[name].get_bins)
                       for i, name in enumerate(feature_names)],
                 normed=normed)
         np.nan_to_num(hist, copy=False)
@@ -102,19 +102,19 @@ def extract_note_stats(cfg, data):
         return name, hist
 
     # Create a dictionary mapping stat names to their values
-    stats_cfg = cfg['stats'] if cfg and 'stats' in cfg else Configuration(NOTE_STAT_DEFS)
+    stats_cfg = _cfg['stats'] if 'stats' in _cfg else Configuration(NOTE_STAT_DEFS)
     return dict(stats_cfg.configure(make_hist))
 
 
-@configurable(['note_stats', 'time_pitch_diff'])
-def extract_all_stats(cfg, data):
+@configurable
+def extract_all_stats(data, *, _cfg):
     results = {}
-    results['time_pitch_diff'] = cfg['time_pitch_diff'].configure(
+    results['time_pitch_diff'] = _cfg['time_pitch_diff'].configure(
         time_pitch_diff_hist,
         data=data,
         normed=True,
         allow_empty=False)
-    results.update(cfg['note_stats'].configure(extract_note_stats, data=data))
+    results.update(_cfg['note_stats'].configure(extract_note_stats, data=data))
 
     return {k: v for k, v in results.items() if v is not None}
 
@@ -130,9 +130,9 @@ def main():
 
     if args.config:
         with open(args.config, 'rb') as f:
-            cfg = Configuration.from_yaml(f)
+            _cfg = Configuration.from_yaml(f)
     else:
-        cfg = Configuration({})
+        _cfg = Configuration({})
 
     random.seed(42)
 
@@ -163,7 +163,7 @@ def main():
             _LOGGER.info(f'Skipping style {style} with {total_notes} note(s).')
             continue
 
-        stats = cfg.configure(extract_all_stats, data=sequences)
+        stats = _cfg.configure(extract_all_stats, data=sequences)
         for stat_name, stat in stats.items():
             results[stat_name][style] = stat
 

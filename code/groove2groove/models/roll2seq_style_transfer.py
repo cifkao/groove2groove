@@ -7,9 +7,9 @@ import coloredlogs
 import numpy as np
 import tensorflow as tf
 import tqdm
+from confugue import Configuration, configurable
 from magenta.music.protobuf import music_pb2
 from museflow.components import EmbeddingLayer, RNNDecoder, RNNLayer
-from museflow.config import Configuration, configurable
 from museflow.model_utils import (DatasetManager, create_train_op, make_simple_dataset,
                                   prepare_train_and_val_data, set_random_seed)
 from museflow.nn.rnn import InputWrapper
@@ -22,7 +22,7 @@ from groove2groove.models.common import CNN
 _LOGGER = logging.getLogger(__name__)
 
 
-@configurable(pass_kwargs=False)
+@configurable
 class Model:
 
     def __init__(self, dataset_manager, train_mode, vocabulary, sampling_seed=None):
@@ -121,7 +121,7 @@ class Model:
             concat_batches=True)
 
 
-@configurable(pass_kwargs=False)
+@configurable
 class Experiment:
 
     def __init__(self, logdir, train_mode, sampling_seed=None):
