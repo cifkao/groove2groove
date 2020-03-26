@@ -15,8 +15,8 @@ class CNN(Component):
 
         self._is_training = training
         with self.use_scope():
-            self._layers_2d = self._cfg['2d_layers'].maybe_configure() or []
-            self._layers_1d = self._cfg['1d_layers'].maybe_configure() or []
+            self._layers_2d = self._cfg['2d_layers'].configure_list()
+            self._layers_1d = self._cfg['1d_layers'].configure_list()
 
     def __call__(self, inputs):
         return self.apply(inputs)
