@@ -2,7 +2,8 @@ import '../scss/main.scss';
 
 import 'bootstrap/js/dist/modal';
 import {saveAs} from 'file-saver';
-import * as mm from '@magenta/music';
+import * as mm from '@magenta/music/es6/core';
+import {NoteSequence} from '@magenta/music/es6/protobuf';
 
 
 window.$ = window.jQuery = jQuery;
@@ -133,8 +134,8 @@ $('.generate-button').on('click', function() {
 
   // Create request
   const formData = new FormData();
-  formData.append('content_input', new Blob([mm.NoteSequence.encode(data['content'].sequence).finish()]), 'content_input');
-  formData.append('style_input', new Blob([mm.NoteSequence.encode(data['style'].sequence).finish()]), 'style_input');
+  formData.append('content_input', new Blob([NoteSequence.encode(data['content'].sequence).finish()]), 'content_input');
+  formData.append('style_input', new Blob([NoteSequence.encode(data['style'].sequence).finish()]), 'style_input');
   formData.append('sample', $('#samplingCheckbox').is(':checked'));
   formData.append('softmax_temperature', $('#samplingTemperature').val());
 
@@ -146,7 +147,7 @@ $('.generate-button').on('click', function() {
       stopAllPlayers();
 
       // Decode the protobuffer
-      const seq = mm.NoteSequence.decode(new Uint8Array(buffer));
+      const seq = NoteSequence.decode(new Uint8Array(buffer));
 
       // Assign a new filename based on the input filenames
       seq.filename = data['content'].sequence.filename.replace(/\.[^.]+$/, '') + '__' + data['style'].sequence.filename;
@@ -277,8 +278,8 @@ function initRemix(staticMode) {
     const contentSeq = data['content'].trimmedSequence;
     const outputSeq = data['output'].trimmedSequence;
     const formData = new FormData();
-    formData.append('content_sequence', new Blob([mm.NoteSequence.encode(contentSeq).finish()]), 'content_sequence');
-    formData.append('output_sequence', new Blob([mm.NoteSequence.encode(outputSeq).finish()]), 'output_sequence');
+    formData.append('content_sequence', new Blob([NoteSequence.encode(contentSeq).finish()]), 'content_sequence');
+    formData.append('output_sequence', new Blob([NoteSequence.encode(outputSeq).finish()]), 'output_sequence');
 
     // Get the response
     setControlsEnabled(section, false);
@@ -286,7 +287,7 @@ function initRemix(staticMode) {
       .then((response) => response.arrayBuffer())
       .then(function (buffer) {
         // Decode the protobuffer
-        const seq = mm.NoteSequence.decode(new Uint8Array(buffer));
+        const seq = NoteSequence.decode(new Uint8Array(buffer));
 
         // Assign a new filename based on the input filenames
         seq.filename = outputSeq.filename.replace(/\.[^.]+$/, '') + '__remix.mid';
@@ -383,7 +384,7 @@ export function exportPreset() {
     for (const key in data[seqId]) {
       if (!['player', 'visualizer', 'section', 'fullSequence'].includes(key)) {
         var value = data[seqId][key];
-        if (value instanceof mm.NoteSequence) {
+        if (value instanceof NoteSequence) {
           value = value.toJSON();
         }
         dataCopy[seqId][key] = value;
@@ -407,7 +408,7 @@ export function loadPreset(preset) {
     for (const key in preset.data[seqId]) {
       presetData[key] = preset.data[seqId][key];
       if (presetData[key].notes) {
-        presetData[key] = mm.NoteSequence.fromObject(presetData[key]);
+        presetData[key] = NoteSequence.fromObject(presetData[key]);
       }
     }
 
