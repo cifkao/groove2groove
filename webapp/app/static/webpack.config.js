@@ -25,6 +25,22 @@ const config = {
   module: {
     rules: [
       {
+        test: /\.m?js$/,
+        exclude: /(node_modules|bower_components)/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: [
+              ['@babel/preset-env', {
+                useBuiltIns: 'usage',
+                corejs: 3
+              }]
+            ],
+            plugins: ['@babel/plugin-proposal-object-rest-spread']
+          }
+        }
+      },
+      {
         test: /\.(scss)$/,
         use: [{
           loader: 'style-loader',
@@ -44,7 +60,7 @@ const config = {
           loader: 'sass-loader'
         }]
       },
-			{
+      {
         test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
         use: [
           {
@@ -52,7 +68,7 @@ const config = {
             options: {
               name: '[name].[ext]',
               outputPath: 'fonts/',
-							publicPath: 'static/fonts/'
+              publicPath: 'static/fonts/'
             }
           }
         ]
