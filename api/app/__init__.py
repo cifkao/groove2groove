@@ -13,7 +13,6 @@ from groove2groove.models import roll2seq_style_transfer
 
 
 app = flask.Flask(__name__,
-                  static_folder='static/dist', static_url_path='/static',
                   instance_relative_config=True)
 app.config.from_object('app.config')
 app.config.from_pyfile('app.cfg', silent=True)
@@ -35,11 +34,6 @@ def init_models():
             models[model_name] = config.configure(roll2seq_style_transfer.Experiment,
                                                   logdir=logdir, train_mode=False)
             models[model_name].trainer.load_variables(**model_cfg.get('load_variables', {}))
-
-
-@app.route('/')
-def index():
-    return flask.render_template("index.html")
 
 
 @app.route('/api/v1/style_transfer/<model_name>/', methods=['POST'])
