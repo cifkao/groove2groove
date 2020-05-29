@@ -4,6 +4,7 @@ import threading
 
 from confugue import Configuration
 import flask
+from flask_cors import CORS
 from magenta.music.protobuf.music_pb2 import NoteSequence
 from museflow.note_sequence_utils import normalize_tempo
 import tensorflow as tf
@@ -16,6 +17,8 @@ app = flask.Flask(__name__,
                   instance_relative_config=True)
 app.config.from_object('app.config')
 app.config.from_pyfile('app.cfg', silent=True)
+
+CORS(app, **app.config.get('cors', {}))
 
 models = {}
 model_graphs = {}
