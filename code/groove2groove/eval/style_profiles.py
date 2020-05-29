@@ -103,7 +103,7 @@ def extract_note_stats(data, *, _cfg):
 
     # Create a dictionary mapping stat names to their values
     stats_cfg = _cfg['stats'] if 'stats' in _cfg else Configuration(NOTE_STAT_DEFS)
-    return dict(stats_cfg.configure(make_hist))
+    return dict(stats_cfg.configure_list(make_hist))
 
 
 @configurable
