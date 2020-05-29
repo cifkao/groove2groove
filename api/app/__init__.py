@@ -18,7 +18,7 @@ app = flask.Flask(__name__,
 app.config.from_object('app.config')
 app.config.from_pyfile('app.cfg', silent=True)
 
-CORS(app, **app.config.get('cors', {}))
+CORS(app, **app.config.get('CORS', {}))
 
 models = {}
 model_graphs = {}
