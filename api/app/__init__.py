@@ -17,12 +17,22 @@ app = flask.Flask(__name__,
                   instance_relative_config=True)
 app.config.from_object('app.config')
 app.config.from_pyfile('app.cfg', silent=True)
+if 'STATIC_FOLDER' in app.config:
+    app.static_folder = app.config['STATIC_FOLDER']
+    app.static_url_path = '/'
 
 CORS(app, **app.config.get('CORS', {}))
 
 models = {}
 model_graphs = {}
 tf_lock = threading.Lock()
+
+
+if app.config.get('SERVE_STATIC_FILES', False):
+    @app.route("/", defaults={'path': 'index.html'})
+    @app.route("/<path:path>")
+    def root(path):
+        return flask.send_from_directory(app.static_folder, path)
 
 
 @app.before_first_request
