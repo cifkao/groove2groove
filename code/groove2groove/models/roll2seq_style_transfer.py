@@ -196,11 +196,12 @@ class Experiment:
                         sample=args.sample, softmax_temperature=args.softmax_temperature)
 
     def run(self, pipeline, batch_size=None, filters='program', sample=False,
-            softmax_temperature=1.):
+            softmax_temperature=1., normalize_velocity=False):
         metadata_list = []  # gather metadata about each item of the dataset
         apply_filters = '__program__' if filters == 'program' else True
         dataset = make_simple_dataset(
             self._load_data(tqdm.tqdm(pipeline), apply_filters=apply_filters,
+                            normalize_velocity=normalize_velocity,
                             metadata_list=metadata_list),
             output_types=self.input_types,
             output_shapes=self.input_shapes,
@@ -237,7 +238,7 @@ class Experiment:
         return merged_sequences
 
     def _load_data(self, loader, training=False, encode=True, apply_filters=True,
-                   metadata_list=None):
+                   metadata_list=None, normalize_velocity=False):
         max_target_len = self._cfg.get('max_target_length', np.inf)
         if apply_filters is False:
             filter_kwargs_dict = {'__all__': {}}
@@ -256,6 +257,11 @@ class Experiment:
             long_skip_count = 0
             empty_count = 0
             for input_index, (src_seq, style_seq_all, tgt_seq_all) in enumerate(loader):
+                if normalize_velocity:
+                    src_seq, style_seq_all, tgt_seq_all = (
+                        self._normalize_velocity(seq)
+                        for seq in (src_seq, style_seq_all, tgt_seq_all))
+
                 if apply_filters == '__program__':
                     # Create a filter for each program
                     programs = sorted(set((n.program, n.is_drum) for n in style_seq_all.notes))
@@ -317,6 +323,24 @@ class Experiment:
                              f'skipped: {long_skip_count} too long, {empty_count} empty')
 
         return generator
+
+    def _normalize_velocity(self, seq):
+        seq_copy = music_pb2.NoteSequence()
+        seq_copy.CopyFrom(seq)
+        seq = seq_copy
+
+        target_mean = self._cfg['normalize_velocity'].get('mean')
+        target_std = np.sqrt(self._cfg['normalize_velocity'].get('variance'))
+        velocities = np.fromiter((n.velocity for n in seq if n.velocity), dtype=np.float32)
+        mean = np.mean(velocities)
+        std = np.std(velocities)
+
+        for note in seq:
+            velocity = (note.velocity - mean) / (std + 1e-5) * target_std + target_mean
+            velocity = np.rint(velocity).astype(np.int32)
+            note.velocity = np.clip(velocity, 1, 127)
+
+        return seq
 
 
 def main():

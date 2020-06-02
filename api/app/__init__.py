@@ -61,10 +61,12 @@ def run_model(model_name):
                                     bars_per_segment=8, warp=True)
     with tf_lock, model_graphs[model_name].as_default():
         outputs = models[model_name].run(
-                pipeline, sample=sample, softmax_temperature=softmax_temperature)
+                pipeline, sample=sample, softmax_temperature=softmax_temperature,
+                normalize_velocity=True)
     output_seq = pipeline.postprocess(outputs)
     return flask.send_file(io.BytesIO(output_seq.SerializeToString()),
                            mimetype='application/protobuf')
+
 
 @app.route('/api/v1/remix/', methods=['POST'])
 def remix():
