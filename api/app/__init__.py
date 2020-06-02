@@ -59,7 +59,7 @@ def run_model(model_name):
     softmax_temperature = float(flask.request.form.get('softmax_temperature', 0.6))
 
     style_tempo = np.mean([t.qpm for t in style_seq.tempos]) if len(style_seq.tempos) > 0 else 120
-    if style_seq.total_time / 60 * style_tempo >= 36:
+    if style_seq.total_time / 60 * style_tempo >= 40:
         return error_response('STYLE_INPUT_TOO_LONG');
 
     pipeline = NoteSequencePipeline(source_seq=content_seq, style_seq=style_seq,
