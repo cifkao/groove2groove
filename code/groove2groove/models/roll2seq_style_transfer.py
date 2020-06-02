@@ -325,6 +325,9 @@ class Experiment:
         return generator
 
     def _normalize_velocity(self, seq):
+        if seq is None:
+            return None
+
         seq_copy = music_pb2.NoteSequence()
         seq_copy.CopyFrom(seq)
         seq = seq_copy
