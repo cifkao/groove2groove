@@ -331,11 +331,11 @@ class Experiment:
 
         target_mean = self._cfg['normalize_velocity'].get('mean')
         target_std = np.sqrt(self._cfg['normalize_velocity'].get('variance'))
-        velocities = np.fromiter((n.velocity for n in seq if n.velocity), dtype=np.float32)
+        velocities = np.fromiter((n.velocity for n in seq.notes if n.velocity), dtype=np.float32)
         mean = np.mean(velocities)
         std = np.std(velocities)
 
-        for note in seq:
+        for note in seq.notes:
             velocity = (note.velocity - mean) / (std + 1e-5) * target_std + target_mean
             velocity = np.rint(velocity).astype(np.int32)
             note.velocity = np.clip(velocity, 1, 127)
