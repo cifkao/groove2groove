@@ -7,6 +7,7 @@ import flask
 from flask_cors import CORS
 from magenta.music.protobuf.music_pb2 import NoteSequence
 from museflow.note_sequence_utils import normalize_tempo
+import numpy as np
 import tensorflow as tf
 
 from groove2groove.io import NoteSequencePipeline
@@ -57,6 +58,10 @@ def run_model(model_name):
     sample = flask.request.form.get('sample') == 'true'
     softmax_temperature = float(flask.request.form.get('softmax_temperature', 0.6))
 
+    style_tempo = np.mean([t.qpm for t in style_seq.tempos]) if len(style_seq.tempos) > 0 else 120
+    if style_seq.total_time / 60 * style_tempo >= 36:
+        return error_response('STYLE_INPUT_TOO_LONG');
+
     pipeline = NoteSequencePipeline(source_seq=content_seq, style_seq=style_seq,
                                     bars_per_segment=8, warp=True)
     with tf_lock, model_graphs[model_name].as_default():
@@ -94,3 +99,9 @@ def remix():
 
     return flask.send_file(io.BytesIO(output_seq.SerializeToString()),
                            mimetype='application/protobuf')
+
+
+def error_response(error, status_code=400):
+    response = flask.make_response(error, 400)
+    response.mimetype = 'text/plain';
+    return response;
