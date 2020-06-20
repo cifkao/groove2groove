@@ -15,8 +15,6 @@ from magenta.music.protobuf import music_pb2
 
 
 def main():
-    loggger = logging.getLogger()
-
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('input_file', metavar='FILE')
     parser.add_argument('output_dir', metavar='OUTPUTDIR')
