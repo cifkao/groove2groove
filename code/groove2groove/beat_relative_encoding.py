@@ -164,7 +164,7 @@ class BeatRelativeEncoding:
             self._log_errors('Encountered {} errors'.format(error_count))
 
         # Handle hanging notes
-        num_hanging = sum(len(l) for l in notes_on.values())
+        num_hanging = sum(len(lst) for lst in notes_on.values())
         if any(notes_on.values()):
             if self._errors == 'remove':
                 self._log_errors(f'Removing {num_hanging} hanging note(s)')
