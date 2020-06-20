@@ -112,13 +112,14 @@ class Model:
                                         summary_op=train_summary_op,
                                         training_placeholder=self._is_training)
 
-    def run(self, session, dataset, sample=False, softmax_temperature=1.):
+    def run(self, session, dataset, sample=False, softmax_temperature=1., options=None):
         _, output_ids_tensor = self.sample_outputs if sample else self.greedy_outputs
 
         return self.dataset_manager.run_over_dataset(
             session, output_ids_tensor, dataset,
             feed_dict={self.softmax_temperature: softmax_temperature},
-            concat_batches=True)
+            concat_batches=True,
+            options=options)
 
 
 @configurable
@@ -196,7 +197,7 @@ class Experiment:
                         sample=args.sample, softmax_temperature=args.softmax_temperature)
 
     def run(self, pipeline, batch_size=None, filters='program', sample=False,
-            softmax_temperature=1., normalize_velocity=False):
+            softmax_temperature=1., normalize_velocity=False, options=None):
         metadata_list = []  # gather metadata about each item of the dataset
         apply_filters = '__program__' if filters == 'program' else True
         dataset = make_simple_dataset(
@@ -207,7 +208,7 @@ class Experiment:
             output_shapes=self.input_shapes,
             batch_size=batch_size or self._cfg['data_prep'].get('val_batch_size'))
         output_ids = self.model.run(
-            self.trainer.session, dataset, sample, softmax_temperature) or []
+            self.trainer.session, dataset, sample, softmax_temperature, options=options) or []
         sequences = [self.output_encoding.decode(ids) for ids in output_ids]
         merged_sequences = []
         instrument_id = 0

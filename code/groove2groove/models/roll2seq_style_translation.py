@@ -104,13 +104,14 @@ class Model:
                                         summary_op=train_summary_op,
                                         training_placeholder=self._is_training)
 
-    def run(self, session, dataset, sample=False, softmax_temperature=1.):
+    def run(self, session, dataset, sample=False, softmax_temperature=1., options=None):
         _, output_ids_tensor = self.sample_outputs if sample else self.greedy_outputs
 
         return self.dataset_manager.run_over_dataset(
             session, output_ids_tensor, dataset,
             feed_dict={self.softmax_temperature: softmax_temperature},
-            concat_batches=True)
+            concat_batches=True,
+            options=options)
 
 
 @configurable
