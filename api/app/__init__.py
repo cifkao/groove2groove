@@ -5,10 +5,13 @@ import threading
 from confugue import Configuration
 import flask
 from flask_cors import CORS
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from magenta.music.protobuf.music_pb2 import NoteSequence
 from museflow.note_sequence_utils import normalize_tempo
 import numpy as np
 import tensorflow as tf
+from werkzeug.contrib.fixers import ProxyFix
 
 from groove2groove.io import NoteSequencePipeline
 from groove2groove.models import roll2seq_style_transfer
@@ -22,6 +25,8 @@ if 'STATIC_FOLDER' in app.config:
     app.static_folder = app.config['STATIC_FOLDER']
     app.static_url_path = '/'
 
+app.wsgi_app = ProxyFix(app.wsgi_app, **app.config.get('PROXY_FIX', {}))
+limiter = Limiter(app, key_func=get_remote_address, headers_enabled=True, **app.config.get('LIMITER', {}))
 CORS(app, **app.config.get('CORS', {}))
 
 models = {}
@@ -51,6 +56,7 @@ def init_models():
 
 
 @app.route('/api/v1/style_transfer/<model_name>/', methods=['POST'])
+@limiter.limit(app.config.get('MODEL_RATE_LIMIT', None))
 def run_model(model_name):
     files = flask.request.files
     content_seq = NoteSequence.FromString(files['content_input'].read())
@@ -71,6 +77,11 @@ def run_model(model_name):
     output_seq = pipeline.postprocess(outputs)
     return flask.send_file(io.BytesIO(output_seq.SerializeToString()),
                            mimetype='application/protobuf')
+
+
+@app.errorhandler(429)
+def ratelimit_handler(error):
+    return error_response('RATE_LIMIT_EXCEEDED', status_code=429)
 
 
 def error_response(error, status_code=400):
