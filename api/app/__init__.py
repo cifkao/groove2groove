@@ -85,6 +85,6 @@ def ratelimit_handler(error):
 
 
 def error_response(error, status_code=400):
-    response = flask.make_response(error, 400)
+    response = flask.make_response(error, status_code)
     response.mimetype = 'text/plain';
     return response;
