@@ -11,7 +11,7 @@ from magenta.music.protobuf.music_pb2 import NoteSequence
 from museflow.note_sequence_utils import normalize_tempo
 import numpy as np
 import tensorflow as tf
-from werkzeug.contrib.fixers import ProxyFix
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from groove2groove.io import NoteSequencePipeline
 from groove2groove.models import roll2seq_style_transfer
