@@ -8,13 +8,13 @@ import numpy as np
 import tensorflow as tf
 import tqdm
 from confugue import Configuration, configurable
-from note_seq.protobuf import music_pb2
 from museflow.components import EmbeddingLayer, RNNDecoder, RNNLayer
 from museflow.model_utils import (DatasetManager, create_train_op, make_simple_dataset,
                                   prepare_train_and_val_data, set_random_seed)
 from museflow.nn.rnn import InputWrapper
 from museflow.note_sequence_utils import filter_sequence, set_note_fields
 from museflow.trainer import BasicTrainer
+from note_seq.protobuf import music_pb2
 
 from groove2groove.io import EvalPipeline, MidiPipeline, TrainLoader
 from groove2groove.models.common import CNN

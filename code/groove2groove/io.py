@@ -15,10 +15,10 @@ import random
 
 import lmdb
 import numpy as np
-from note_seq import midi_io, sequences_lib
-from note_seq.protobuf import music_pb2
 from museflow.io.note_sequence_io import save_sequences_db
 from museflow.note_sequence_utils import normalize_tempo, split_on_downbeats
+from note_seq import midi_io, sequences_lib
+from note_seq.protobuf import music_pb2
 
 _LOGGER = logging.getLogger(__name__)
 

@@ -4,11 +4,11 @@ import warnings
 from collections import defaultdict
 
 import numpy as np
-from note_seq.constants import STANDARD_PPQ
-from note_seq.protobuf import music_pb2
 from museflow import note_sequence_utils
 from museflow.encodings.performance_encoding import _compress_note_offs
 from museflow.vocabulary import Vocabulary
+from note_seq.constants import STANDARD_PPQ
+from note_seq.protobuf import music_pb2
 
 _LOGGER = logging.getLogger(__name__)
 

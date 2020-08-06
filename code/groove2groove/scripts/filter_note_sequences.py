@@ -4,8 +4,8 @@ import argparse
 import re
 
 import tensorflow as tf
-from note_seq.protobuf import music_pb2
 from museflow.note_sequence_utils import filter_sequence
+from note_seq.protobuf import music_pb2
 
 try:
     from tensorflow.io import TFRecordWriter

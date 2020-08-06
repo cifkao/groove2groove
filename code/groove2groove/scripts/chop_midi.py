@@ -11,9 +11,9 @@ import os
 import sys
 
 import pretty_midi
+from museflow import note_sequence_utils
 from note_seq import midi_io
 from note_seq.protobuf import music_pb2
-from museflow import note_sequence_utils
 
 try:
     from tensorflow.io import TFRecordWriter
