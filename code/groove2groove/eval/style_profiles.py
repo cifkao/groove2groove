@@ -11,7 +11,7 @@ import coloredlogs
 import lmdb
 import numpy as np
 from confugue import Configuration, configurable
-from magenta.music.protobuf.music_pb2 import NoteSequence
+from note_seq.protobuf.music_pb2 import NoteSequence
 from museflow import note_sequence_utils
 
 from groove2groove.eval import note_features

@@ -4,7 +4,7 @@ import argparse
 import re
 
 import tensorflow as tf
-from magenta.music.protobuf import music_pb2
+from note_seq.protobuf import music_pb2
 from museflow.note_sequence_utils import filter_sequence
 
 try:

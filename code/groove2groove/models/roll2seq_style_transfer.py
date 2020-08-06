@@ -8,7 +8,7 @@ import numpy as np
 import tensorflow as tf
 import tqdm
 from confugue import Configuration, configurable
-from magenta.music.protobuf import music_pb2
+from note_seq.protobuf import music_pb2
 from museflow.components import EmbeddingLayer, RNNDecoder, RNNLayer
 from museflow.model_utils import (DatasetManager, create_train_op, make_simple_dataset,
                                   prepare_train_and_val_data, set_random_seed)

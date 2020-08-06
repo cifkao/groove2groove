@@ -4,8 +4,8 @@ import warnings
 from collections import defaultdict
 
 import numpy as np
-from magenta.music.constants import STANDARD_PPQ
-from magenta.music.protobuf import music_pb2
+from note_seq.constants import STANDARD_PPQ
+from note_seq.protobuf import music_pb2
 from museflow import note_sequence_utils
 from museflow.encodings.performance_encoding import _compress_note_offs
 from museflow.vocabulary import Vocabulary

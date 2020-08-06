@@ -15,8 +15,8 @@ import random
 
 import lmdb
 import numpy as np
-from magenta.music import midi_io, sequences_lib
-from magenta.music.protobuf import music_pb2
+from note_seq import midi_io, sequences_lib
+from note_seq.protobuf import music_pb2
 from museflow.io.note_sequence_io import save_sequences_db
 from museflow.note_sequence_utils import normalize_tempo, split_on_downbeats
 

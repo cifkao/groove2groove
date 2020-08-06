@@ -11,8 +11,8 @@ import os
 import sys
 
 import pretty_midi
-from magenta.music import midi_io
-from magenta.music.protobuf import music_pb2
+from note_seq import midi_io
+from note_seq.protobuf import music_pb2
 from museflow import note_sequence_utils
 
 try:

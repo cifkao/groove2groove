@@ -9,8 +9,8 @@ import numpy as np
 import pretty_midi
 import scipy.signal
 import scipy.spatial.distance
-from magenta.music import midi_io
-from magenta.music.protobuf.music_pb2 import NoteSequence
+from note_seq import midi_io
+from note_seq.protobuf.music_pb2 import NoteSequence
 
 
 def chroma_similarity(sequence_a, sequence_b, sampling_rate, window_size, stride,

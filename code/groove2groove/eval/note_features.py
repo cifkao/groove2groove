@@ -1,5 +1,5 @@
 import numpy as np
-from magenta.music import midi_io
+from note_seq import midi_io
 
 _EPSILON = 1e-9
 
