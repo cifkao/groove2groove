@@ -1,0 +1,41 @@
+# Example app.cfg file to put in the instance/ directory.
+# Uncomment options as needed.
+
+
+MODEL_ROOT = '/path/to/models'
+MODELS = {
+  'v01_drums': {
+    'load_variables': {
+      'checkpoint_name': 'latest'
+    },
+  },
+  'v01_drums_vel': {
+    'logdir': 'v01_drums_vel',  # specify if different from key
+    'load_variables': {
+      'checkpoint_name': 'latest'
+    },
+  },
+}
+
+#SERVE_STATIC_FILES = False
+#STATIC_FOLDER = '/path/to/static'
+
+
+### Flask extension settings ###
+
+#CORS = dict(origins=['*'])
+#PROXY_FIX = dict()
+#LIMITER = dict(storage_uri='redis+unix:///path/to/redis.sock')
+
+
+### Limits ###
+
+#BATCH_TIMEOUT = 25  # seconds
+#MODEL_RATE_LIMIT = '2/second;30/minute;360/hour'
+
+#MAX_CONTENT_LENGTH = 350000  # Maximum total upload size: 350 KB - this option is read by Werkzeug
+#MAX_CONTENT_INPUT_BEATS = 512
+#MAX_CONTENT_INPUT_NOTES = 25000
+#MAX_STYLE_INPUT_BEATS = 40
+#MAX_STYLE_INPUT_NOTES = 1000
+#MAX_STYLE_INPUT_PROGRAMS = 8
