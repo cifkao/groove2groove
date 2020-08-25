@@ -1,4 +1,5 @@
 import io
+import logging
 import os
 import threading
 
@@ -11,6 +12,7 @@ from note_seq.protobuf.music_pb2 import NoteSequence
 from museflow.note_sequence_utils import normalize_tempo
 import numpy as np
 import tensorflow as tf
+import werkzeug.exceptions
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 from groove2groove.io import NoteSequencePipeline
@@ -28,6 +30,8 @@ if 'STATIC_FOLDER' in app.config:
 app.wsgi_app = ProxyFix(app.wsgi_app, **app.config.get('PROXY_FIX', {}))
 limiter = Limiter(app, key_func=get_remote_address, headers_enabled=True, **app.config.get('LIMITER', {}))
 CORS(app, **app.config.get('CORS', {}))
+
+logging.getLogger('tensorflow').handlers.clear()
 
 models = {}
 model_graphs = {}
@@ -64,27 +68,90 @@ def run_model(model_name):
     sample = flask.request.form.get('sample') == 'true'
     softmax_temperature = float(flask.request.form.get('softmax_temperature', 0.6))
 
-    style_tempo = np.mean([t.qpm for t in style_seq.tempos]) if len(style_seq.tempos) > 0 else 120
-    if style_seq.total_time / 60 * style_tempo >= 40:
-        return error_response('STYLE_INPUT_TOO_LONG');
+    sanitize_ns(content_seq)
+    sanitize_ns(style_seq)
+
+    content_stats = ns_stats(content_seq)
+    if content_stats['beats'] > app.config.get('MAX_CONTENT_INPUT_BEATS', np.inf) + 1e-2:
+        return error_response('CONTENT_INPUT_TOO_LONG')
+    if content_stats['notes'] > app.config.get('MAX_CONTENT_INPUT_NOTES', np.inf):
+        return error_response('CONTENT_INPUT_TOO_MANY_NOTES')
+
+    style_stats = ns_stats(style_seq)
+    app.logger.info(style_stats)
+    if style_stats['beats'] > app.config.get('MAX_STYLE_INPUT_BEATS', np.inf) + 1e-2:
+        return error_response('STYLE_INPUT_TOO_LONG')
+    if style_stats['notes'] > app.config.get('MAX_STYLE_INPUT_NOTES', np.inf):
+        return error_response('STYLE_INPUT_TOO_MANY_NOTES')
+    if style_stats['programs'] > app.config.get('MAX_STYLE_INPUT_PROGRAMS', np.inf):
+        return error_response('STYLE_INPUT_TOO_MANY_INSTRUMENTS')
+
+    run_options = tf.RunOptions(timeout_in_ms=int(app.config.get('BATCH_TIMEOUT') * 1000))
 
     pipeline = NoteSequencePipeline(source_seq=content_seq, style_seq=style_seq,
                                     bars_per_segment=8, warp=True)
-    with tf_lock, model_graphs[model_name].as_default():
-        outputs = models[model_name].run(
-                pipeline, sample=sample, softmax_temperature=softmax_temperature,
-                normalize_velocity=True)
+    try:
+        with tf_lock, model_graphs[model_name].as_default():
+            outputs = models[model_name].run(
+                    pipeline, sample=sample, softmax_temperature=softmax_temperature,
+                    normalize_velocity=True, options=run_options)
+    except tf.errors.DeadlineExceededError:
+        return error_response('MODEL_TIMEOUT', status_code=500)
     output_seq = pipeline.postprocess(outputs)
     return flask.send_file(io.BytesIO(output_seq.SerializeToString()),
                            mimetype='application/protobuf')
 
 
-@app.errorhandler(429)
-def ratelimit_handler(error):
-    return error_response('RATE_LIMIT_EXCEEDED', status_code=429)
+@app.errorhandler(werkzeug.exceptions.HTTPException)
+def http_error_handler(error):
+    response = error.get_response()
+    response.data = flask.json.dumps({
+        'code': error.code,
+        'error': error.name,
+        'description': error.description
+    })
+    response.content_type = 'application/json';
+    return response
 
 
 def error_response(error, status_code=400):
-    response = flask.make_response(error, status_code)
-    response.mimetype = 'text/plain';
+    response = flask.make_response(flask.json.dumps({'error': error}), status_code)
+    response.content_type = 'application/json';
     return response;
+
+
+def sanitize_ns(ns):
+    if not ns.tempos:
+        tempo = ns.tempos.add()
+        tempo.time = 0
+        tempo.qpm = 120
+    if not ns.time_signatures:
+        ts = ns.time_signatures.add()
+        time_signature.time = 0
+        time_signature.numerator = 4
+        time_signature.denominator = 4
+
+    for note in ns.notes:
+        note.end_time = max(note.start_time, note.end_time)
+        ns.total_time = max(ns.total_time, note.end_time)
+
+    for collection in [ns.tempos, ns.time_signatures, ns.key_signatures, ns.pitch_bends,
+                       ns.control_changes, ns.text_annotations, ns.section_annotations]:
+        filtered = [event for event in collection if event.time <= ns.total_time]
+        del collection[:]
+        collection.extend(filtered)
+
+
+def ns_stats(ns):
+    stats = {'beats': 0}
+
+    tempos = list(ns.tempos)
+    tempos.append(NoteSequence.Tempo(time=ns.total_time + 1e-4))
+    tempos.sort(key=lambda x: x.time)
+    for i in range(len(tempos) - 1):
+       stats['beats'] += (tempos[i + 1].time - tempos[i].time) * tempos[i].qpm / 60
+
+    stats['programs'] = len(set((note.program, note.is_drum) for note in ns.notes))
+    stats['notes'] = len(ns.notes)
+
+    return stats
