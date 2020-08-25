@@ -86,7 +86,9 @@ def run_model(model_name):
     if style_stats['programs'] > app.config.get('MAX_STYLE_INPUT_PROGRAMS', np.inf):
         return error_response('STYLE_INPUT_TOO_MANY_INSTRUMENTS')
 
-    run_options = tf.RunOptions(timeout_in_ms=int(app.config.get('BATCH_TIMEOUT') * 1000))
+    run_options = None
+    if 'BATCH_TIMEOUT' in app.config:
+        run_options = tf.RunOptions(timeout_in_ms=int(app.config['BATCH_TIMEOUT'] * 1000))
 
     pipeline = NoteSequencePipeline(source_seq=content_seq, style_seq=style_seq,
                                     bars_per_segment=8, warp=True)
