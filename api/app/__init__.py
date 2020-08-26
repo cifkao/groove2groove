@@ -78,7 +78,6 @@ def run_model(model_name):
         return error_response('CONTENT_INPUT_TOO_MANY_NOTES')
 
     style_stats = ns_stats(style_seq)
-    app.logger.info(style_stats)
     if style_stats['beats'] > app.config.get('MAX_STYLE_INPUT_BEATS', np.inf) + 1e-2:
         return error_response('STYLE_INPUT_TOO_LONG')
     if style_stats['notes'] > app.config.get('MAX_STYLE_INPUT_NOTES', np.inf):
