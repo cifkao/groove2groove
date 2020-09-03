@@ -328,6 +328,8 @@ class Experiment:
     def _normalize_velocity(self, seq):
         if seq is None:
             return None
+        if not self._cfg.get('normalize_velocity'):
+            return seq
 
         seq_copy = music_pb2.NoteSequence()
         seq_copy.CopyFrom(seq)
