@@ -2,8 +2,6 @@
 """Fix key signatures in a MIDI file to make it possible to load it with mido."""
 
 import argparse
-import collections
-import re
 import sys
 
 import mido
