@@ -3,7 +3,7 @@ Experiment configuration files
 
 Each subdirectory contains the configuration file for a single model. [`v01_drums_vel`](./v01_drums_vel/) is the main proposed model,
 the rest are from the ablation study (section VI-C in the paper). **Generally, we find that [`v01_drums`](./v01_drums/) (which does not model 
-elocity) performs considerably better on real-world MIDI files than the main proposed model.**
+velocity) performs considerably better on real-world MIDI files than the main proposed model.**
 
 - [`v01_drums_vel`](./v01_drums_vel/model.yaml) ('dr. + vel.') supports both drums and velocity
 - [`v01_drums`](./v01_drums/model.yaml) ('drums') does not support velocity
