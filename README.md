@@ -10,6 +10,26 @@ This is the source code for the paper *Groove2Groove: One-Shot Music Style Trans
 [:musical_note: Examples on YouTube](https://www.youtube.com/playlist?list=PLPdw6Kin7U86tcz-vlMmKqQmq4yL325aH)  
 [:file_folder: MIDI file dataset](https://doi.org/10.5281/zenodo.3957999)  
 
+## Installation
+
+Clone the repository and make sure you have Python 3.6 or later. Then run the following commands.
+
+1. (optional) If you use conda, you can create your environment using
+   ```sh
+   conda env create -f environment.yml
+   ```
+   This will also install the correct versions of the CUDA and CuDNN libraries.
+   
+2. Install requirements:
+   ```sh
+   pip install -r requirements.txt
+   ```
+
+3. Install the package with:
+   ```sh
+   pip install './code[gpu]'
+   ```
+
 ## Acknowledgment
 This work has received funding from the European Union’s Horizon 2020 research and innovation programme under the Marie Skłodowska-Curie grant agreement No. 765068.
 
