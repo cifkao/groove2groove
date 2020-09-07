@@ -5,7 +5,7 @@ This is the source code for the paper *Groove2Groove: One-Shot Music Style Trans
 
 ### Links
 
-[:microscope: Paper postprint](https://hal.archives-ouvertes.fr/hal-02923548)  
+[:microscope: Paper postprint](https://hal.archives-ouvertes.fr/hal-02923548) [[pdf](https://hal.archives-ouvertes.fr/hal-02923548/document)]  
 [:musical_keyboard: Supplementary website](https://groove2groove.telecom-paris.fr/) with examples and a live demo  
 [:musical_note: Examples on YouTube](https://www.youtube.com/playlist?list=PLPdw6Kin7U86tcz-vlMmKqQmq4yL325aH)  
 [:file_folder: MIDI file dataset](https://doi.org/10.5281/zenodo.3957999)  
