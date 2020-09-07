@@ -24,3 +24,5 @@ Bodhidharma
 -----------
 Go to the `bodhidharma` directory and run `./prepare.sh`. This will download, extract and preprocess
 the dataset.
+
+Additionally, velocity normalization needs to be performed by running the [`vel_norm.ipynb`](./vel_norm.ipynb) notebook.
