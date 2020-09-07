@@ -28,7 +28,7 @@ mkdir "$dir" && {
       --min-notes-per-segment 1 \
       --merge-instruments \
       --force-tempo 60 \
-      01_fixed/ "$dir/data" || die
+      "$data_dir/" "$dir/data" || die
 }
 
 dir=03_separated
