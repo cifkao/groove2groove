@@ -2,6 +2,7 @@
 """Given a list of MIDI files, filter them to include only those in 4/4 time."""
 
 import sys
+
 import pretty_midi
 
 
