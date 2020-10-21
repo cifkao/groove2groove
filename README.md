@@ -23,20 +23,24 @@ If you use the code in your research, please reference the paper.
 
 ## Installation
 
-Clone the repository and make sure you have Python 3.6 or later. Then run the following commands.
+Clone the repository, then run the following commands.
 
-1. (optional) If you use conda, you can create your environment using
-   ```sh
-   conda env create -f environment.yml
-   ```
-   This will also install the correct versions of the CUDA and CuDNN libraries.
+1. Install the dependencies using one of the following options:
+
+   -  Using conda:
+      ```sh
+      conda env create -f environment.yml
+      ```
+      This will also install the correct versions of the CUDA and CuDNN libraries.
    
-2. Install requirements:
-   ```sh
-   pip install -r requirements.txt
-   ```
+   -  Using pip (you will need Python 3.6 or later):
+      ```sh
+      pip install -r requirements.txt
+      ```
+   
+   The code has been tested with TensorFlow 1.12, CUDA 9.0 and CuDNN 7.6.0. Other versions of TensorFlow (1.x) may work too.
 
-3. Install the package with:
+2. Install the package with:
    ```sh
    pip install './code[gpu]'
    ```
