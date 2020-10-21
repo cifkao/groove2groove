@@ -3,7 +3,7 @@ coloredlogs==10.0
 confugue==0.1.1
 lmdb==0.98
 note-seq==0.0.1
-museflow @ git+https://github.com/cifkao/museflow@master
+museflow[gpu]==1.0.0
 mido==1.2.6
 numpy==1.18.0
 pandas==0.25.3
