@@ -44,10 +44,11 @@ Clone the repository and make sure you have Python 3.6 or later. Then run the fo
 
 The main entry point of the package is the `groove2groove.models.roll2seq_style_transfer` module, which takes care of training and running the model. Run `python -m groove2groove.models.roll2seq_style_transfer -h` to see the available command line arguments.
 
-The `train` command runs the training, replacing `$LOGDIR` with the directory containing the `model.yaml` configuration file (e.g. one of the directories under [`experiments`](./experiments)):
+The `train` command runs the training:
 ```sh
 python -m groove2groove.models.roll2seq_style_transfer --logdir $LOGDIR train
 ```
+Replace `$LOGDIR` with the model directory, containing the `model.yaml` configuration file (e.g. one of the directories under [`experiments`](./experiments)).
 
 To run the trained model on a single pair of MIDI files, use the `run-midi` command, e.g.:
 ```sh
