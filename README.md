@@ -27,13 +27,13 @@ Clone the repository, then run the following commands.
 
 1. Install the dependencies using one of the following options:
 
-   -  Using conda:
+   -  Create a new environment using conda:
       ```sh
       conda env create -f environment.yml
       ```
-      This will also install the correct versions of the CUDA and CuDNN libraries.
+      This will also install the correct versions of Python and the CUDA and CuDNN libraries.
    
-   -  Using pip (you will need Python 3.6 or later):
+   -  Using pip (you will need Python 3.6 or later, and a virtual environment is recommended):
       ```sh
       pip install -r requirements.txt
       ```
