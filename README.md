@@ -1,6 +1,6 @@
 # Groove2Groove
 
-This is the source code for the paper:
+This is the source code for the IEEE TASLP paper:
 > Ondřej Cífka, Umut Şimşekli and Gaël Richard. "Groove2Groove: One-Shot Music Style Transfer with Supervision from Synthetic Data." *IEEE/ACM Transactions on Audio, Speech, and Language Processing*, 28:2638–2650, 2020. doi: [10.1109/TASLP.2020.3019642](https://doi.org/10.1109/TASLP.2020.3019642).
 
 If you use the code in your research, please reference the paper.
