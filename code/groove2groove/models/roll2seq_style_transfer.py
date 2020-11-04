@@ -192,7 +192,7 @@ class Experiment:
         pipeline.save(sequences, args.output_db)
 
     def _run_cli(self, args, pipeline):
-        self.trainer.load_variables(checkpoint_file=args.checkpoint)
+        self.trainer.load_variables(checkpoint_name='latest', checkpoint_file=args.checkpoint)
         return self.run(pipeline, batch_size=args.batch_size, filters=args.filters,
                         sample=args.sample, softmax_temperature=args.softmax_temperature)
 
