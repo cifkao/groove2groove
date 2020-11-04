@@ -33,11 +33,12 @@ Clone the repository, then run the following commands.
       ```
       This will also install the correct versions of Python and the CUDA and CuDNN libraries.
    
-   -  Using pip (you will need Python 3.6 or later, and a virtual environment is recommended):
+   -  Using pip (a virtual environment is recommended):
       ```sh
       pip install -r requirements.txt
       ```
-   
+      You will need Python 3.6 because we use a version of TensorFlow which is not available from PyPI for more recent Python versions.
+
    The code has been tested with TensorFlow 1.12, CUDA 9.0 and CuDNN 7.6.0. Other versions of TensorFlow (1.x) may work too.
 
 2. Install the package with:
