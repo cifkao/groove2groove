@@ -1,6 +1,7 @@
 cached-property==1.5.1
 coloredlogs==10.0
 confugue==0.1.1
+jupyter==1.0.0
 lmdb==0.98
 note-seq==0.0.1
 museflow[gpu]==1.0.0
