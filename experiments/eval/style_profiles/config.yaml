@@ -1,0 +1,21 @@
+time_pitch_diff:
+  bin_size: !!python/object/apply:eval [ 1/6 ]
+  max_time: 4
+  pitch_range: 20
+
+note_stats:
+  stats:
+    - name: onset.duration
+      features:
+        - name: onset
+          bins: &onset_bins
+            bin_size: !!python/object/apply:eval [ 1/6 ]
+        - name: duration
+          bins:
+            bin_size: !!python/object/apply:eval [ 1/6 ]
+            max_value: 2
+    - name: onset.velocity
+      features:
+        - name: onset
+          bins: *onset_bins
+        - name: velocity

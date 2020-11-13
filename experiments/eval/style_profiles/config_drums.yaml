@@ -1,0 +1,16 @@
+note_stats:
+  stats:
+    - name: onset.drum
+      features:
+        - name: onset
+          bins: &onset_bins
+            bin_size: !!python/object/apply:eval [ 1/6 ]
+        - name: pitch
+          bins: &pitch_bins
+            min_value: 0
+            max_value: 127
+    - name: onset.velocity
+      features:
+        - name: onset
+          bins: *onset_bins
+        - name: velocity
