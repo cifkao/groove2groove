@@ -18,8 +18,8 @@ If you use the code in your research, please reference the paper.
 - [`code`](./code): the main codebase (a Python package called `groove2groove`)
 - [`data`](./data): scripts needed to prepare the datasets
 - [`experiments`](./experiments): experiment configuration files
+- [`experiments/eval`](./experiments/eval): evaluation code (see the [`eval.ipynb`](./experiments/eval/eval.ipynb) notebook)
 - [`api`](./api): an API server for the web demo
-- evaluation code still needs to be added
 
 ## Installation
 
