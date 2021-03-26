@@ -8,7 +8,7 @@ mido==1.2.6
 numpy==1.18.0
 pandas==0.25.3
 pretty-midi==0.2.8
-PyYAML==5.2
+PyYAML==5.4
 tensorflow==1.12.0
 tqdm==4.41.1
 
