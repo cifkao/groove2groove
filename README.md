@@ -9,9 +9,10 @@ If you use the code in your research, please reference the paper.
 
 [:microscope: Paper postprint](https://hal.archives-ouvertes.fr/hal-02923548) [[pdf](https://hal.archives-ouvertes.fr/hal-02923548/document)]  
 [:musical_keyboard: Supplementary website](https://groove2groove.telecom-paris.fr/) with examples and a live demo  
-[:musical_note: Examples on YouTube](https://www.youtube.com/playlist?list=PLPdw6Kin7U86tcz-vlMmKqQmq4yL325aH)  
-[:file_folder: MIDI file dataset](https://doi.org/10.5281/zenodo.3957999) containing almost 3000 different styles  
+[:musical_note: Examples on YouTube](https://www.youtube.com/playlist?list=PLPdw6Kin7U86tcz-vlMmKqQmq4yL325aH)    
+[:file_folder: MIDI file dataset](https://doi.org/10.5281/zenodo.3957999), containing almost 3000 different styles  
 [:robot: Band-in-a-Box automation scripts](https://github.com/cifkao/pybiab) for generating the dataset  
+[:brain: Model parameters](https://groove2groove.telecom-paris.fr/data/checkpoints/) (to be extracted into `experiments/`)
 
 
 ## Looking around
@@ -56,7 +57,7 @@ python -m groove2groove.models.roll2seq_style_transfer --logdir $LOGDIR train
 ```
 Replace `$LOGDIR` with the model directory, containing the `model.yaml` configuration file (e.g. one of the directories under [`experiments`](./experiments)).
 
-To run the trained model on a single pair of MIDI files, use the `run-midi` command, e.g.:
+To run a trained model on a single pair of MIDI files, use the `run-midi` command, e.g.:
 ```sh
 python -m groove2groove.models.roll2seq_style_transfer --logdir $LOGDIR run-midi \
     --sample --softmax-temperature 0.6 \
