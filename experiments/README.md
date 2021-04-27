@@ -10,3 +10,5 @@ velocity) performs considerably better on real-world MIDI files than the main pr
 - [`v01_vel`](./v01_vel/model.yaml) ('velocity') does not support drums
 - [`v01`](./v01/model.yaml) ('none') supports neither of the above
 - [`v01_drums_vel_perf`](./v01_drums_vel_perf/model.yaml) ('dr. + vel. + 𝛥') is like `v01_drums_vel`, but uses the 𝛥-encoding
+
+To use the [pre-trained model checkpoints](https://groove2groove.telecom-paris.fr/data/checkpoints/), extract them inside this directory (the checkpoint files for each model should end up next to the corresponding `model.yaml` file).
