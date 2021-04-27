@@ -12,7 +12,7 @@ If you use the code in your research, please reference the paper.
 [:musical_note: Examples on YouTube](https://www.youtube.com/playlist?list=PLPdw6Kin7U86tcz-vlMmKqQmq4yL325aH)    
 [:file_folder: MIDI file dataset](https://doi.org/10.5281/zenodo.3957999), containing almost 3000 different styles  
 [:robot: Band-in-a-Box automation scripts](https://github.com/cifkao/pybiab) for generating the dataset  
-[:brain: Model parameters](https://groove2groove.telecom-paris.fr/data/checkpoints/) (to be extracted into `experiments/`)
+[:brain: Model parameters](https://groove2groove.telecom-paris.fr/data/checkpoints/) (to be extracted into [`experiments`](./experiments))
 
 
 ## Looking around
