@@ -6,7 +6,7 @@ lmdb==0.98
 note-seq==0.0.1
 museflow[gpu]==1.0.0
 mido==1.2.6
-numpy==1.18.0
+numpy==1.22.0
 pandas==0.25.3
 pretty-midi==0.2.8
 PyYAML==5.2
