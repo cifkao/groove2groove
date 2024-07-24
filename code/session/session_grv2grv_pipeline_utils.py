@@ -132,8 +132,8 @@ def find_structure_invalid_names_in_xls(structure_xls_path,
 def pre_process_midi_file_and_save(input_midi_path: str, structure_xls_path: str, preprocess_out_folder: str, 
                                    required_parts: List[str]=['Verse','Chorus','Pre Chorus'],
                                    auto_map_midi = True, split_drum = True, 
-                                   no_drum_part_name_extention: str = '_no_drum',
-                                   drum_part_name_extention: str = '_only_drum',
+                                   no_drum_part_name_extension: str = '_no_drum',
+                                   drum_part_name_extension: str = '_only_drum',
                                    replace_if_file_exist = True, verbose = True,) -> List[str]:
     """
     Util function for pre-processing MIDI files for groove2groove including saving.
@@ -178,8 +178,8 @@ def pre_process_midi_file_and_save(input_midi_path: str, structure_xls_path: str
                                                                     part_struct_first_and_last_bar_dict, 
                                                                     auto_map_midi = auto_map_midi, 
                                                                     split_drum = split_drum,
-                                                                    no_drum_part_name_extention = no_drum_part_name_extention,
-                                                                    drum_part_name_extention = drum_part_name_extention,)
+                                                                    no_drum_part_name_extension = no_drum_part_name_extension,
+                                                                    drum_part_name_extension = drum_part_name_extension,)
     
     # save files:
     base_name =Path(input_midi_path).stem

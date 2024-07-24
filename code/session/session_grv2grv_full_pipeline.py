@@ -3,7 +3,7 @@ from pathlib import Path
 import json
 from session_grv2grv_pipeline_utils import (pre_process_midi_file_and_save, 
                                             post_process_midi_file_and_save)
-from groove2groove_wrapper import run_groove2groove, Groove2GrooveModelName, get_groove2groove_metrics
+from groove2groove_wrapper import run_groove2groove, Groove2GrooveModelName, run_groove2groove_evaluation_script
 
 # run self blend
 
@@ -19,16 +19,15 @@ def create_self_blend_per_part(midi_path: str,
                                python_grv2grv_full_link='/home/ubuntu/.conda/envs/groove2groove5/bin/python'):
 
     split_drums = True
-    no_drum_part_name_extention = '_no_drum'
-    drum_part_name_extention = '_only_drum'
-    grv2grv_extention = (('D' if 'drum' in str(groove2groove_model) else '') + ('V' if 'vel' in str(groove2groove_model) else '') + 
-                         '_' + str(groove2groove_temperature).replace('.','')) 
+    no_drum_part_name_extension = '_no_drum'
+    drum_part_name_extension = '_only_drum'
+    grv2grv_extension = (('D' if 'drum' in str(groove2groove_model) else '') + ('V' if 'vel' in str(groove2groove_model) else '') + 
+                         '_T' + str(groove2groove_temperature).replace('.','')) 
     
-    post_processing_extention = '_self_blended'
+    post_processing_extension = '_self_blended'
 
-    
     # for fixing bpm  
-    replace_bpm = True
+    replace_bpm = False
     # define preprocess output folder
     preprocess_out_folder = Path(output_folder) / 'temp'
 
@@ -42,21 +41,21 @@ def create_self_blend_per_part(midi_path: str,
     program_dict_path = [p for p in saved_path_list if p.endswith('.program_dict.json')][0]
 
     for midi_file_part_no_drum in saved_path_list:
-        if midi_file_part_no_drum.endswith(f'{no_drum_part_name_extention}.mid'):
-            midi_grv2grv_out_path = Path(preprocess_out_folder) / f"{Path(midi_file_part_no_drum).stem}.X.{Path(midi_file_part_no_drum).stem}.{grv2grv_extention}.mid" 
+        if midi_file_part_no_drum.endswith(f'{no_drum_part_name_extension}.mid'):
+            midi_grv2grv_out_path = Path(preprocess_out_folder) / f"{Path(midi_file_part_no_drum).stem}.X.{Path(midi_file_part_no_drum).stem}.{grv2grv_extension}.mid" 
     
             # run groove2groove with the files
             run_groove2groove(midi_file_part_no_drum, midi_file_part_no_drum, midi_grv2grv_out_path, model_name=groove2groove_model, 
                               temperature=groove2groove_temperature, python_grv2grv_full_link=python_grv2grv_full_link)    
             
             # run evaluation with the files
-            metrics = get_groove2groove_metrics(midi_file_part_no_drum, midi_file_part_no_drum, midi_grv2grv_out_path)
+            metrics = run_groove2groove_evaluation_script(midi_file_part_no_drum, midi_file_part_no_drum, midi_grv2grv_out_path)
             # save metrics json
 
             # run prost process
-            drum_midi_path = midi_file_part_no_drum.replace(f'{no_drum_part_name_extention}.mid',f'{drum_part_name_extention}.mid')
+            drum_midi_path = midi_file_part_no_drum.replace(f'{no_drum_part_name_extension}.mid',f'{drum_part_name_extension}.mid')
 
-            post_processing_output_midi_path = Path(output_folder) / Path(midi_file_part_no_drum).name.replace(no_drum_part_name_extention, post_processing_extention)
+            post_processing_output_midi_path = Path(output_folder) / Path(midi_file_part_no_drum).name.replace(no_drum_part_name_extension, post_processing_extension)
             post_process_midi_file_and_save(midi_grv2grv_out_path=midi_grv2grv_out_path, 
                                             post_processing_output_midi_path=post_processing_output_midi_path,
                                             automap_back=auto_map_midi,

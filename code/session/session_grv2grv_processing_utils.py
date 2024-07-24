@@ -192,8 +192,8 @@ def preprocess_midi_file(midi_path,
                          part_struct_first_and_last_bar_dict: Dict[str, Tuple[int, int]] = {}, 
                          auto_map_midi = True,
                          split_drum = True,
-                         no_drum_part_name_extention: str = '_no_drum',
-                         drum_part_name_extention: str = '_only_drum',
+                         no_drum_part_name_extension: str = '_no_drum',
+                         drum_part_name_extension: str = '_only_drum',
                          default_struct_part_name: str = 'full',
                          ) -> Tuple[Dict[str, m21.stream.Score], Dict[int, str], Dict[int, str], float]:
     """
@@ -225,15 +225,15 @@ def preprocess_midi_file(midi_path,
 
             if split_drum:
                 midi_stream_cropped_no_drum, midi_stream_cropped_only_drum = split_drum_from_midi_stream(midi_stream_cropped)
-                stream_dict[struct_part + no_drum_part_name_extention] = midi_stream_cropped_no_drum
-                stream_dict[struct_part + drum_part_name_extention] = midi_stream_cropped_only_drum
+                stream_dict[struct_part + no_drum_part_name_extension] = midi_stream_cropped_no_drum
+                stream_dict[struct_part + drum_part_name_extension] = midi_stream_cropped_only_drum
             else:
                 stream_dict[struct_part] = midi_stream_cropped
     else:
         if split_drum:
             midi_stream_cropped_no_drum, midi_stream_cropped_only_drum = split_drum_from_midi_stream(midi_stream)
-            stream_dict[default_struct_part_name + no_drum_part_name_extention] = midi_stream_cropped_no_drum
-            stream_dict[default_struct_part_name + drum_part_name_extention] = midi_stream_cropped_only_drum
+            stream_dict[default_struct_part_name + no_drum_part_name_extension] = midi_stream_cropped_no_drum
+            stream_dict[default_struct_part_name + drum_part_name_extension] = midi_stream_cropped_only_drum
         else:
             stream_dict[default_struct_part_name] = midi_stream  # shouldn't I take full length as a default?
 
