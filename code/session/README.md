@@ -39,8 +39,10 @@ Mandatory:
 
 Additional options:      
   --required_parts (str, nargs='*', default=[]): List of required structure parts to be processed. If empty, use all parts.
+ 
   --auto_map_midi (bool, default=True): Enable sequential MIDI program number mapping.
       When set to True, this will enable automatic sequential mapping of MIDI program numbers.
+  
   --groove2groove_temperature (float, default=0.4): Temperature parameter between 0-1.
       This sets the temperature parameter for the groove2groove model, which controls the randomness of the model's output.
 
@@ -53,5 +55,5 @@ Additional options:
   --verbose (bool, default=True): Print more information to the terminal.
       Enables verbose mode, which provides additional details during execution.
 
-  --python_grv2grv_full_link (str, default='/home/ubuntu/.conda/envs/groove2groove5/bin/python'): Path to the Python executable with matching environment for groove2groove.
+  --python_grv2grv_full_link (str, default='/home/ubuntu/.conda/envs/groove2groove/bin/python'): Path to the Python executable with matching environment for groove2groove.
       This specifies the path to the Python executable that has the appropriate environment for running groove2groove.
