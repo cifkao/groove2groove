@@ -40,8 +40,9 @@ Mandatory:
 Additional options:      
   --required_parts: List of the required structure part names to be processed. If empty, use all parts.
   
-  --auto_map_midi: Boolean flag for enabling sequential MIDI program number mapping.
-      When set to True, this will enable automatic sequential mapping of MIDI program numbers.
+  --auto_map_midi: Boolean flag for enabling sequential MIDI program number mapping (this is relevant for Session MIDIs with Plug-ins only). 
+      When set to True, this will enable automatic sequential mapping of MIDI program numbers by the part-instrument names. Default=True.
+      For non-Session MIDIs - should be set to False.
   
   --groove2groove_temperature: The temperature parameter for the groove2groove model, between 0-1. default=0.4. controls the randomness of the model's output.
 
