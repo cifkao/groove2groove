@@ -55,5 +55,4 @@ Additional options:
 
   --verbose: Flag for enabling verbose mode, which provides additional details during execution. (Default = True)
 
-  --python_grv2grv_full_link (str, default='/home/ubuntu/.conda/envs/groove2groove/bin/python'): Path to the Python executable with matching environment for groove2groove.
-      This specifies the path to the Python executable that has the appropriate environment for running groove2groove.
+  --python_grv2grv_full_link: Path to the Python executable that has the appropriate environment for running groove2groove. (Default='/home/ubuntu/.conda/envs/groove2groove/bin/python')
