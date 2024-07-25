@@ -18,7 +18,7 @@ class Groove2GrooveModelName(str, Enum):
 def run_groove2groove(content_midi: str, style_midi: str, output_midi: str,
                       temperature: float = 0.4, 
                       model_name: Groove2GrooveModelName = Groove2GrooveModelName.V01_DRUMS, 
-                      python_grv2grv_full_link: str = None, 
+                      python_exe_for_grv2grv_env: str = None, 
                       verbose: bool = True):
     """
     A wrapper function for running groove2groove from python as a subprocess with a different virtual environment (python 3.6 with grv2grv dependencies).
@@ -29,12 +29,12 @@ def run_groove2groove(content_midi: str, style_midi: str, output_midi: str,
     :param output_midi: Path where the groove2groove output MIDI file will be saved.
     :param temperature: A float between 0-1 to control the randomness of the generation. Lower values result in less randomness. Default is 0.4.
     :param model_name: The name of the groove2groove model to be used for style transfer.
-    :param python_grv2grv_full_link: Optional. Full link to the Python environment matching groove2groove requirements (python 3.6 etc).
+    :param python_exe_for_grv2grv_env: Optional. Full link to the Python environment matching groove2groove requirements (python 3.6 etc).
     :param verbose: A boolean to control the verbosity of the process. If True, detailed logs will be printed to the terminal.
     """
 
-    python_grv2grv_full_link = 'python' if python_grv2grv_full_link is None else python_grv2grv_full_link 
-    grv2grv_command = f"{python_grv2grv_full_link} -m groove2groove.models.roll2seq_style_transfer --logdir './experiments/{model_name}' run-midi \
+    python_exe_for_grv2grv_env = 'python' if python_exe_for_grv2grv_env is None else python_exe_for_grv2grv_env 
+    grv2grv_command = f"{python_exe_for_grv2grv_env} -m groove2groove.models.roll2seq_style_transfer --logdir './experiments/{model_name}' run-midi \
 --sample --softmax-temperature {temperature} '{content_midi}' '{style_midi}' '{output_midi}'"
 
     if verbose:
@@ -62,11 +62,11 @@ def run_groove2groove_evaluation_script(content_midi: str, style_midi: str, outp
                                         analysis_out_path: Optional[str] = None,
                                         temperature: Optional[float] = None, 
                                         model_name: Optional[Groove2GrooveModelName] = None, 
-                                        python_grv2grv_full_link: Optional[str] = None, 
+                                        python_exe_for_grv2grv_env: Optional[str] = None, 
                                         verbose: bool = True):
 
-    python_grv2grv_full_link = 'python' if python_grv2grv_full_link is None else python_grv2grv_full_link 
-    grv2grv_evaluation_command = f"{python_grv2grv_full_link} -m code.session.grv2grv_eval_script \
+    python_exe_for_grv2grv_env = 'python' if python_exe_for_grv2grv_env is None else python_exe_for_grv2grv_env 
+    grv2grv_evaluation_command = f"{python_exe_for_grv2grv_env} -m code.session.grv2grv_eval_script \
 --cont_midi_path '{content_midi}' --style_midi_path '{style_midi}' --out_midi_path '{output_midi}'" 
     grv2grv_evaluation_command += f" --analysis_out_path '{analysis_out_path}'" if analysis_out_path is not None else ""
     grv2grv_evaluation_command += f" --model_name {model_name}" if model_name is not None else ""
@@ -96,7 +96,7 @@ def run_groove2groove_evaluation_script(content_midi: str, style_midi: str, outp
 if __name__=='__main__':
     content_midi = style_midi = 'data/sync/data_for_sync/HitCraft_All_Files_Bank_Thin/Black Music Projects/Sub - Genre Afrobeat/57 Afrobeat #1 In F#m/Exports/57 Afrobeat #1 In F#m.midi'
     grv2grv_kwargs = dict(content_midi=content_midi, style_midi=style_midi, output_midi='output.mid', model_name='v01_drums', temperature='0.4', 
-                          python_grv2grv_full_link='/home/ubuntu/.conda/envs/groove2groove5/bin/python')
+                          python_exe_for_grv2grv_env='/home/ubuntu/.conda/envs/groove2groove5/bin/python')
     run_groove2groove(**grv2grv_kwargs)
     run_groove2groove_evaluation_script(**grv2grv_kwargs)
 

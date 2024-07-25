@@ -18,7 +18,7 @@ def create_blend_per_part(content_midi_path: str,
                           groove2groove_model: Groove2GrooveModelName = Groove2GrooveModelName.V01_DRUMS,
                           replace_if_file_exist = True,
                           verbose=True, 
-                          python_grv2grv_full_link='/home/ubuntu/.conda/envs/groove2groove/bin/python'):
+                          python_exe_for_grv2grv_env='/home/ubuntu/.conda/envs/groove2groove/bin/python'):
 
     """Util function for creating a self-blend per part of a MIDI file using groove2groove.
     Self blend involves partition of the MIDI to parts (according to a given xls), splitting drums, 
@@ -41,7 +41,7 @@ def create_blend_per_part(content_midi_path: str,
     :param groove2groove_model: Groove2GrooveModelName or string, specifying the groove2groove model to use (v01_drums_vel, v01_drums, etc.).
     :param replace_if_file_exist: Bool flag. If True and output file exists, replace it with the new version.
     :param verbose: Bool flag. If True, print more information to the terminal.
-    :param python_grv2grv_full_link: Path to the Python executable with matching environment for groove2groove.
+    :param python_exe_for_grv2grv_env: Path to the Python executable with matching environment for groove2groove.
     """
 
     split_drums = True
@@ -90,7 +90,7 @@ def create_blend_per_part(content_midi_path: str,
             if replace_if_file_exist or not midi_grv2grv_out_path.exists():
             # run groove2groove with the files
                 run_groove2groove(content_midi_file_part_no_drum, style_midi_file_part_no_drum, midi_grv2grv_out_path, model_name=groove2groove_model, 
-                                temperature=groove2groove_temperature, python_grv2grv_full_link=python_grv2grv_full_link, verbose=verbose)
+                                temperature=groove2groove_temperature, python_exe_for_grv2grv_env=python_exe_for_grv2grv_env, verbose=verbose)
             elif verbose:
                 print(f"groove2groove output {midi_grv2grv_out_path} exists, skipping groove2groove run...")   
             
@@ -100,7 +100,7 @@ def create_blend_per_part(content_midi_path: str,
                 run_groove2groove_evaluation_script(content_midi_file_part_no_drum, style_midi_file_part_no_drum, midi_grv2grv_out_path, 
                                                     analysis_out_path = analysis_out_path,
                                                     model_name=groove2groove_model,  temperature=groove2groove_temperature, 
-                                                    python_grv2grv_full_link=python_grv2grv_full_link, verbose=verbose)
+                                                    python_exe_for_grv2grv_env=python_exe_for_grv2grv_env, verbose=verbose)
             elif verbose:
                 print(f"groove2groove evaluation file {analysis_out_path} exists, skipping groove2groove evaluation run...")  
 
@@ -148,7 +148,7 @@ def parse_arguments():
                         help="Replace the file if it exists.")
     parser.add_argument("--verbose", type=bool, default=True, 
                         help="Print more information to the terminal.")
-    parser.add_argument("--python_grv2grv_full_link", type=str, default='/home/ubuntu/.conda/envs/groove2groove/bin/python', 
+    parser.add_argument("--python_exe_for_grv2grv_env", type=str, default='/home/ubuntu/.conda/envs/groove2groove/bin/python', 
                         help="Path to the Python executable with matching environment for groove2groove.")
     
     args = parser.parse_args()
@@ -169,7 +169,7 @@ if __name__ == "__main__":
             groove2groove_model=Groove2GrooveModelName(args.groove2groove_model),
             replace_if_file_exist=args.replace_if_file_exist,
             verbose=args.verbose,
-            python_grv2grv_full_link=args.python_grv2grv_full_link)
+            python_exe_for_grv2grv_env=args.python_exe_for_grv2grv_env)
 
     else:
         # TODO: get rid of this - NATAN - Maybe add example files?
@@ -183,4 +183,4 @@ if __name__ == "__main__":
         create_blend_per_part(content_midi_path=content_midi_path, content_structure_xls_path=content_structure_xls_path, 
                               style_midi_path=style_midi_path, style_structure_xls_path=style_structure_xls_path, 
                               output_folder=output_folder, verbose=True, replace_if_file_exist=True,
-                              python_grv2grv_full_link='/home/ubuntu/.conda/envs/groove2groove5/bin/python')
+                              python_exe_for_grv2grv_env='/home/ubuntu/.conda/envs/groove2groove5/bin/python')
