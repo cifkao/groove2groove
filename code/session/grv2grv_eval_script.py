@@ -116,12 +116,12 @@ if __name__=='__main__':
                             temperature=args.temperature)
 
     if args.verbose:
-        print(f'results: {results}')    
+        print(f'Results: {results}')    
     # Save the dictionary to a JSON file
     with open(file_analysis_json_path, 'w') as json_file:
         json.dump(results, json_file, indent=4)
         if args.verbose:
-            print(f'evaluation results saved to {file_analysis_json_path}')
+            print(f'Evaluation results saved to {file_analysis_json_path}')
 
     
 

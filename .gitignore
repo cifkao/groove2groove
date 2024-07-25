@@ -104,3 +104,10 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+code/sync/code_for_sync/sftp.json
+data/sync/
+experiments/v01_drums.zip.1
+experiments/v01_drums/
+experiments/v01_drums/v01_drums.zip
+experiments/v01_drums_vel/
+code/sync

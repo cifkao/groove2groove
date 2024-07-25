@@ -135,8 +135,7 @@ def pre_process_midi_file_and_save(input_midi_path: str, structure_xls_path: str
                                    no_drum_part_name_extension: str = '_no_drum',
                                    drum_part_name_extension: str = '_only_drum',
                                    replace_if_file_exist = True, verbose = True,) -> List[str]:
-    """
-    Util function for pre-processing MIDI files for groove2groove including saving.
+    """Util function for pre-processing MIDI files for groove2groove including saving.
     including:  midi files cropped by structure parts (with, without or only drums), 
                 json files with program mapping (for midi mapping) and text file with bpm.
 
@@ -147,8 +146,8 @@ def pre_process_midi_file_and_save(input_midi_path: str, structure_xls_path: str
     :param auto_map_midi: bool flag for enabling sequential midi program number mapping 
             (used to overcome plug-in problems for midi files without program mapping) 
     :param split_drum: bool flag for splitting the drums to different midi file output.
-    :param no_drum_part_name_extention: str, if split_drum is True- this is the extention to be added to the structure part name for the split w/o drums
-    :param drum_part_name_extention: str, if split_drum is True- this is the extention to be added to the structure part name for the split containing only drums
+    :param no_drum_part_name_extension: str, if split_drum is True- this is the extension to be added to the structure part name for the split w/o drums
+    :param drum_part_name_extension: str, if split_drum is True- this is the extension to be added to the structure part name for the split containing only drums
     :param replace_if_file_exist: bool flag. if True and output file exist - replace it with the new version.
     :param verbose: bool flag. if True print more information to the terminal.
     :return: list of all the written file paths. 
@@ -222,7 +221,6 @@ def pre_process_midi_file_and_save(input_midi_path: str, structure_xls_path: str
     return saved_path_list
 
 
-# TODO add explenation
 def post_process_midi_file_and_save(midi_grv2grv_out_path:str, 
                                      post_processing_output_midi_path:str, 
                                      automap_back = True,
@@ -233,7 +231,22 @@ def post_process_midi_file_and_save(midi_grv2grv_out_path:str,
                                      bpm_path: Optional[str] = None,
                                      replace_if_file_exist = True,
                                      verbose = True):
-    
+    """Util function for post-processing groove2groove output-files, including adding drums from other file (original drums),
+    auto midi mapping (mapping back from the pre-processing sequential mapping), restoring bpm from text file and saving.
+    The post-processing is performed per file/part.
+
+    :param midi_grv2grv_out_path: Path to the MIDI file output from groove2groove.
+    :param post_processing_output_midi_path: output path for the post-processed MIDI file.
+    :param automap_back: Bool flag for enabling sequential MIDI program number mapping (restore program mapping if it was altered).
+    :param program_dict_path: Path to a JSON file containing program mappings.
+    :param add_orig_drum: Bool flag to indicate if original drum parts should be added to the processed MIDI file.
+    :param drum_midi_path: Path to the original drum MIDI file if add_orig_drum is True.
+    :param replace_bpm: Bool flag to indicate if the BPM should be replaced.
+    :param bpm_path: Path to a text file containing the BPM value if replace_bpm is True.
+    :param replace_if_file_exist: Bool flag. If True and output file exists, replace it with the new version.
+    :param verbose: Bool flag. If True, print more information to the terminal.
+    """
+
     # check if output file exist
     if not replace_if_file_exist and post_processing_output_midi_path.exists():
         if verbose:
@@ -262,7 +275,6 @@ def post_process_midi_file_and_save(midi_grv2grv_out_path:str,
             print(f"Creating post-processing output folder: '{Path(post_processing_output_midi_path).parent}'")
         Path(post_processing_output_midi_path).parent.mkdir(parents=True, exist_ok=True)
 
-
     # now we can start:
     midi_stream = m21.converter.parse(midi_grv2grv_out_path)
 
@@ -276,7 +288,6 @@ def post_process_midi_file_and_save(midi_grv2grv_out_path:str,
     
     if add_orig_drum:
         drum_stream = m21.converter.parse(drum_midi_path)
-
         midi_stream = replace_drums_in_midi_stream(midi_stream, drum_stream)
         if verbose:
             print(f"replacing '{midi_grv2grv_out_path}' drums with '{drum_midi_path}'")
