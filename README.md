@@ -22,9 +22,12 @@ Therefore, before running the scripts, the two environments should be build:
 ```conda env create -f session_environment.yml```
 ```conda activate session```
 
-In addition - groove2groove model weights must be downloaded first. This can be done using the utility script: 
+In addition - groove2groove model weights must be downloaded first. This can be done using the utility script:
+
 ```code/session/download_groove2groove_model_weights.sh <model_name>```
-Model_name must be one of the following: v01_drums, v01_drums_vel, v01, v0_vel
+
+Model_name must be one of the following: 
+v01_drums, v01_drums_vel, v01, v0_vel
 
 ### Description
 
