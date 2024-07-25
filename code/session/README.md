@@ -45,8 +45,9 @@ Additional options:
   
   --groove2groove_temperature: The temperature parameter for the groove2groove model, between 0-1. default=0.4. controls the randomness of the model's output.
 
-  --groove2groove_model (str, default='v01_drums'): Groove2groove model to use ('v01_drums', 'v01_drums_vel', 'v01', 'v01_vel').
-      Specifies which groove2groove model to use for processing. Available models are listed as choices. note that v01 and v01_vel should be downloaded
+  --groove2groove_model: Groove2groove model to use ('v01_drums', 'v01_drums_vel', 'v01', 'v01_vel') default is 'v01_drums'.
+      Specifies which groove2groove model to use for processing. Available models are listed as choices. 
+      Note that while 'v01_drums', 'v01_drums_vel' can be downloaded via the preperation script, 'v01' and 'v01_vel' should be downloaded seperatly if desired. 
 
   --replace_if_file_exist (bool, default=True): Replace the file if it exists.
       If set to True, the output file will be replaced if it already exists in the specified output folder.
