@@ -24,7 +24,7 @@ Therefore, before running the scripts, the two environments should be build:
 
 In addition - groove2groove model weights must be downloaded first. This can be done using the utility script: 
 ```code/session/download_groove2groove_model_weights.sh <model_name>```
-where model_name is one of: v01_drums, v01_drums_vel, v01, v0_vel
+Model_name must be one of the following: v01_drums, v01_drums_vel, v01, v0_vel
 
 ### Description
 
