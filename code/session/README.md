@@ -32,19 +32,18 @@ You can run the `session_grv2grv_full_pipeline.py` script from the command line 
 
 ### parameters:
 Mandatory:
-  midi_path (str): Path to the input MIDI file that will be used as input for processing.      
-  structure_xls_path (str): Path to the Excel file containing the parts' structure in Session42 format.
-  output_folder (str): Desired output folder for the saving the self-blend outputs.
-      temporary files will be saved in a sub-folder temp
+  midi_path: Path to the input MIDI file that will be used as input for processing.      
+  structure_xls_path: Path to the Excel file containing the parts' structure in Session42 format.
+  output_folder: Desired output folder for the saving the self-blend outputs. 
+    Temporary files will be saved in a sub-folder temp
 
 Additional options:      
-  --required_parts (str, nargs='*', default=[]): List of required structure parts to be processed. If empty, use all parts.
- 
-  --auto_map_midi (bool, default=True): Enable sequential MIDI program number mapping.
+  --required_parts: List of the required structure part names to be processed. If empty, use all parts.
+  
+  --auto_map_midi: Boolean flag for enabling sequential MIDI program number mapping.
       When set to True, this will enable automatic sequential mapping of MIDI program numbers.
   
-  --groove2groove_temperature (float, default=0.4): Temperature parameter between 0-1.
-      This sets the temperature parameter for the groove2groove model, which controls the randomness of the model's output.
+  --groove2groove_temperature: The temperature parameter for the groove2groove model, between 0-1. default=0.4. controls the randomness of the model's output.
 
   --groove2groove_model (str, default='v01_drums'): Groove2groove model to use ('v01_drums', 'v01_drums_vel', 'v01', 'v01_vel').
       Specifies which groove2groove model to use for processing. Available models are listed as choices. note that v01 and v01_vel should be downloaded
