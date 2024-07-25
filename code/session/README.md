@@ -38,23 +38,22 @@ Mandatory:
     Temporary files will be saved in a sub-folder temp
 
 Additional options:      
-  --required_parts: List of the required structure part names to be processed. If empty, use all parts.
+  --required_parts: List of the required structure part names to be processed. If empty, use all parts. (Default = [] empty for using all parts)
   
   --auto_map_midi: Boolean flag for enabling sequential MIDI program number mapping (this is relevant for Session MIDIs with Plug-ins only). 
       When set to True, this will enable automatic sequential mapping of MIDI program numbers by the part-instrument names. Default=True.
-      For non-Session MIDIs - should be set to False.
+      For non-Session MIDIs - should be set to False. (Default = True)
   
   --groove2groove_temperature: The temperature parameter for the groove2groove model, between 0-1. default=0.4. controls the randomness of the model's output.
 
-  --groove2groove_model: Groove2groove model to use ('v01_drums', 'v01_drums_vel', 'v01', 'v01_vel') default is 'v01_drums'.
-      Specifies which groove2groove model to use for processing. Available models are listed as choices. 
+  --groove2groove_model: Groove2groove model to use ('v01_drums', 'v01_drums_vel', 'v01', 'v01_vel'). 
+      Specifies which groove2groove model to use for processing. Available models are listed as choices. (Default = 'v01_drums') 
       Note that while 'v01_drums', 'v01_drums_vel' can be downloaded via the preperation script, 'v01' and 'v01_vel' should be downloaded seperatly if desired. 
 
-  --replace_if_file_exist (bool, default=True): Replace the file if it exists.
-      If set to True, the output file will be replaced if it already exists in the specified output folder.
+  --replace_if_file_exist: Replace the file if it exists. 
+  If set to True, the output file will be replaced if it already exists in the specified output folder. (Default = True)
 
-  --verbose (bool, default=True): Print more information to the terminal.
-      Enables verbose mode, which provides additional details during execution.
+  --verbose: Flag for enabling verbose mode, which provides additional details during execution. (Default = True)
 
   --python_grv2grv_full_link (str, default='/home/ubuntu/.conda/envs/groove2groove/bin/python'): Path to the Python executable with matching environment for groove2groove.
       This specifies the path to the Python executable that has the appropriate environment for running groove2groove.
