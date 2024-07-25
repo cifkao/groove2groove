@@ -26,8 +26,7 @@ In addition - groove2groove model weights must be downloaded first. This can be 
 
 ```code/session/download_groove2groove_model_weights.sh <model_name>```
 
-Model_name must be one of the following: 
-v01_drums, v01_drums_vel, v01, v0_vel
+<model_name> must be one of: `v01_drums`, `v01_drums_vel`, `v01`, `v0_vel`
 
 ### Description
 
