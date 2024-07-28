@@ -63,6 +63,7 @@ Mandatory for: `session_grv2grv_full_pipeline.py`:
   *output_folder: Desired output folder (temporary files will be saved in `/temp` sub-folder)
 
 Additional options for both scripts:      
+
   --required_parts: List of the required structure part names to be processed. If empty, use all parts. (Default = [] empty for using all parts)
   
   --auto_map_midi: Boolean flag for enabling sequential MIDI program number mapping (this is relevant for Session MIDIs with Plug-ins only). 
