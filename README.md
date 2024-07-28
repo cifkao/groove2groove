@@ -11,7 +11,7 @@ This project includes two main scripts:
 `code/session/session_grv2grv_self_blend_pipeline.py` 
 
 
-The main function within `session_grv2grv_full_pipeline.py` is `create_blend_per_part`.
+The main function within `session_grv2grv_full_pipeline.py` and `code/session/session_grv2grv_self_blend_pipeline.py` is `create_blend_per_part`.
 It is used for mixing Content+Style MIDI files using groove2groove, and composed of the foolowing steps:
 
 1. Partitioning the MIDI files into their structure parts (following the given Structure XLS file),
