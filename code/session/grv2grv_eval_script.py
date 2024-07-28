@@ -80,7 +80,7 @@ def analyze_output(cont_midi_path, style_midi_path, out_midi_path,
     if temperature is not None:
         results['temperature'] = temperature
     if seed is not None:
-        results['seed'] = temperature
+        results['seed'] = seed
 
 
     cont_midi  = midi_io.midi_file_to_note_sequence(cont_midi_path)

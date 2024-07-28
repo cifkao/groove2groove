@@ -108,5 +108,5 @@ if __name__ == "__main__":
         structure_xls_path = "data/HitCraft/Black Music Projects/Sub - Genre Afrobeat/57 Afrobeat #1 In F#m/Exports/57 Afrobeat #1 In F#m St.xlsx" 
         output_folder = "/home/ubuntu/out_folder_test1"
         create_self_blend_per_part(midi_path=midi_path, structure_xls_path=structure_xls_path, 
-                                output_folder=output_folder, verbose=True, replace_if_file_exist=True,
+                                output_folder=output_folder, groove2groove_seed=33, verbose=True, replace_if_file_exist=True,
                                 python_exe_for_grv2grv_env='/home/ubuntu/.conda/envs/groove2groove5/bin/python')
