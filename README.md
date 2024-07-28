@@ -46,9 +46,9 @@ This can be done using the utility script, where <model_name> must be one of: `v
 
 ### Command Line Usage
 You can run the `session_grv2grv_full_pipeline.py` script from the command line using the following script:
-```python session_grv2grv_full_pipeline.py path_to_midi_file path_to_structure_xls output_folder --required_parts part1 part2 --auto_map_midi True --groove2groove_temperature 0.4 --groove2groove_model v01_drums --replace_if_file_exist True --verbose True --python_exe_for_grv2grv_env /path/to/python_executable```
+```python code/session/session_grv2grv_self_blend_pipeline.py path_to_midi_file path_to_structure_xls output_folder --required_parts part1 part2 --auto_map_midi True --groove2groove_temperature 0.4 --groove2groove_model v01_drums --replace_if_file_exist True --verbose True --python_exe_for_grv2grv_env /path/to/python_executable```
 
-### parameters:
+### Parameters:
 Mandatory:
   midi_path: Path to the input MIDI file that will be used as input for processing.      
   structure_xls_path: Path to the Excel file containing the parts' structure in Session42 format.
