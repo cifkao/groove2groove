@@ -20,9 +20,9 @@ It is used for mixing Content+Style MIDI files using groove2groove, and composed
 4. Running groove2groove per part (each part servers as the `Style MIDI` and as the `Content MIDI` of the original groove2groove model).
 5. MIDI Mapping Back (if required, by adding the original instruments names)
 6. Adds the original drums (if requested)
-7. Possibly restores the BPM value of the original part (if required, for overcoming bugs)..
+7. Possibly restores the BPM value of the original part (if required, for overcoming bugs).
 
-Temporary files are saved under a `/temp` subfolder of the specified output folder, while the final self-blend output is saved in the provided output folder.
+Al the temporary files are saved under a `/temp` subfolder of the specified output folder, while the final self-blend output is saved in the provided output folder.
 
 ## Technicalities
 ### Creating environment and downloading weights:
