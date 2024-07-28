@@ -4,9 +4,10 @@ It assumes Session42 MIDI inputs, where the instrument name is given as a "MIDI 
 
 ### Overview - Blend Utility (mixing Contend MIDI and Style MIDI) and Self Blend Utilities.
 #### Code
-The code is divided into two. Original groove2groove code can be found in ```code/groove2groove```.
+The code is divided Between two directories. The original groove2groove code is found in ```code/groove2groove```.
 
 The additional code for hanlding Session42 MIDI files - preprocessing, postprocessing and groove2groove wrappers are found in ```code/session/```.
+
 In addition, the following two main scripts are found in the same directory: 
 
 1. `code/session/session_grv2grv_full_pipeline.py` - Blending script - for mixing Session42 Content MIDI + Style MIDIs, MIDIs (The MIDIs are split and structure parts with identical name are being "blend" together)
