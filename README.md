@@ -29,8 +29,11 @@ The main script should be used from the new python env, while providing the exec
 Therefore, before running the scripts, the two environments should be build:
 
 ```conda env create -f groove2groove_environment.yml```
+
 ```conda env create -f session_environment.yml```
+
 ```conda activate session```
+
 
 In addition - groove2groove model weights must be downloaded first. 
 This can be done using the utility script, where <model_name> must be one of: `v01_drums`, `v01_drums_vel`, `v01`, `v0_vel` :
