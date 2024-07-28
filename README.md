@@ -14,11 +14,6 @@ The main function within `session_grv2grv_full_pipeline.py` is `create_self_blen
 
 Temporary files are saved under a `/temp` subfolder of the specified output folder, while the final self-blend output is saved in the provided output folder.
 
-A few notes:
-Note about Time Signature: the current groove2groove model supports only time signature of 4/4. It is possible to edit 3/4 time signature to 4/4 by using triola-legnth notes, but it is not clear what will be the quality of the output. 
-Note about drums: MIDI mapping of percussion was not handled within this project, therfore for the self blending, the original "Content MIDI" drums are added to the output.
-In principle - the "Style MIDI" drums should be taken into account, but due to limiation im midi mapping and in running groove2groove with the un-mapped drums, we decided to use the original drums. Moreover, the length of the Style might be different from the Content+Output (which are identical), therefore we decided to use the Content drums (in the case of self blend the Content and the Style are identical - so it does not matter).
-MIDI mapping - the current implementation support Sequential MIDI mapping to overcome plug-in issues, and run groove2groove correctly. The sequential MIDI program numbers are mapped back at the post-processing stage. Mixing songs with mapping and songs without is currnly not supported.
 
 ## Technicalities
 ### Creating environment and downloading weights:
@@ -78,3 +73,12 @@ Additional options:
 
 
 
+### additional notes:
+#### Time Signature: 
+The current groove2groove model supports only time signature of 4/4. It is possible to edit 3/4 time signature to 4/4 by using triola-legnth notes, but it is not clear what will be the quality of the output. 
+#### Drums: MIDI mapping of percussion was not handled within this project, therfore for the self blending, the original "Content MIDI" drums are added to the output.
+Groove2groove model treats differently pitched instruments (where the midi number signifies pitch) and percussive instruments (where midi number signifies type of instrument). Mapping percussion plug-ins into MIDI numbers is more complicated, since the mapping should involve changing the MIDI Notes numbers. Therefore we currently do not support non-pitched MIDI Mapping.
+In principle - the "Style MIDI" drums should be taken into account for preserving the style. But due to non-pitched midi mapping limiation, and the unexpected result when running groove2groove with un-mapped drums, we decided to use the original drums. Moreover, the length of the Style might be different from the length of the Content + Output MIDIs. Therefore we decided to use the Content drums (in the case of self blend the Content and the Style are identical - so it does not matter).
+
+#### MIDI mapping 
+The current implementation support Sequential MIDI mapping to overcome plug-in issues, and run groove2groove correctly. The sequential MIDI program numbers are mapped back at the post-processing stage. Mixing songs with mapping and songs without is currnly not supported.
