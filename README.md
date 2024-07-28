@@ -83,7 +83,7 @@ Additional options for both scripts:
       Specifies which groove2groove model to use for processing. Available models are listed as choices. (Default = 'v01_drums') 
       Note that the required models should be downloaded first. 
  
-  --groove2groove_seed: the random seed (int) used by groove2groove for sampling different sequences.
+  --groove2groove_seed: the random seed (int) used by groove2groove for sampling different sequences. (Default = 42)
 
   --replace_if_file_exist: Replace the file if it exists. 
   If set to True, the output file will be replaced if it already exists in the specified output folder. (Default = True)
