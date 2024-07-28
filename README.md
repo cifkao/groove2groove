@@ -10,10 +10,19 @@ This project includes two main scripts:
 2. Self varianter- for creating new variants of MIDI parts (each part is blend with itself). 
 `code/session/session_grv2grv_self_blend_pipeline.py` 
 
-The main function within `session_grv2grv_full_pipeline.py` is `create_self_blend_per_part`, which divides the MIDI files to their parts (as given in Session Format structure xls file), splits the drums (if required), performs naive sequential MIDI mapping (if required, for overcoming plugin issues), then runs groove2groove model for per part (each part servers as the `Style MIDI` and as the `Content MIDI`), maps MIDI back by adding the original instruments names (if required), adds original drums (if requested), and possibly restores the BPM value of the original part.
+
+The main function within `session_grv2grv_full_pipeline.py` is `create_blend_per_part`.
+It is used for mixing Content+Style MIDI files using groove2groove, and composed of the foolowing steps:
+
+1. Partitioning the MIDI files into their structure parts (following the given Structure XLS file),
+2. Splitting drums (if required, for adding the original drums in the post processing)
+3. Naive Sequential MIDI mapping  (if required, for overcoming plugin issues)
+4. Running groove2groove per part (each part servers as the `Style MIDI` and as the `Content MIDI` of the original groove2groove model).
+5. MIDI Mapping Back (if required, by adding the original instruments names)
+6. Adds the original drums (if requested)
+7. Possibly restores the BPM value of the original part (if required, for overcoming bugs)..
 
 Temporary files are saved under a `/temp` subfolder of the specified output folder, while the final self-blend output is saved in the provided output folder.
-
 
 ## Technicalities
 ### Creating environment and downloading weights:
@@ -35,11 +44,7 @@ This can be done using the utility script, where <model_name> must be one of: `v
 
 ```code/session/download_groove2groove_model_weights.sh <model_name>```
 
-### Description
-Util function for creating a self-blend per part of a MIDI file using groove2groove. Self-blend involves partitioning the MIDI into parts (according to a given XLS), splitting drums, sequential MIDI mapping, running groove2groove for each part with itself, MIDI mapping back, adding the original drums, and possibly restoring the BPM value of the original part.
-
-
-## Command Line Usage
+### Command Line Usage
 You can run the `session_grv2grv_full_pipeline.py` script from the command line using the following script:
 ```python session_grv2grv_full_pipeline.py path_to_midi_file path_to_structure_xls output_folder --required_parts part1 part2 --auto_map_midi True --groove2groove_temperature 0.4 --groove2groove_model v01_drums --replace_if_file_exist True --verbose True --python_exe_for_grv2grv_env /path/to/python_executable```
 
