@@ -12,7 +12,7 @@ This project includes two main scripts:
 
 The main function within `session_grv2grv_full_pipeline.py` is `create_self_blend_per_part`, which divides the MIDI files to their parts (as given in Session Format structure xls file), splits the drums (if required), performs naive sequential MIDI mapping (if required, for overcoming plugin issues), then runs groove2groove model for per part (each part servers as the `Style MIDI` and as the `Content MIDI`), maps MIDI back by adding the original instruments names (if required), adds original drums (if requested), and possibly restores the BPM value of the original part.
 
-Temporary files are saved under a `temp` subfolder of the specified output folder, while the final self-blend output is saved in the provided output folder.
+Temporary files are saved under a `/temp` subfolder of the specified output folder, while the final self-blend output is saved in the provided output folder.
 
 A few notes:
 Note about Time Signature: the current groove2groove model supports only time signature of 4/4. It is possible to edit 3/4 time signature to 4/4 by using triola-legnth notes, but it is not clear what will be the quality of the output. 
