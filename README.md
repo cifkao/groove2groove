@@ -60,7 +60,7 @@ Mandatory for: `session_grv2grv_full_pipeline.py`:
   * content_structure_xls_path: Path to Content Structure Excel.
   * style_midi_path: Path to Style MIDI. 
   * style_structure_xls_path:  Path to Style Structure Excel.
-  *output_folder: Desired output folder (temporary files will be saved in `/temp` sub-folder)
+  * output_folder: Desired output folder (temporary files will be saved in `/temp` sub-folder)
 
 Additional options for both scripts:      
 
