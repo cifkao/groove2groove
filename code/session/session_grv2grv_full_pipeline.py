@@ -16,7 +16,7 @@ def create_blend_per_part(content_midi_path: str,
                           auto_map_midi = True,
                           groove2groove_temperature:float = 0.4,
                           groove2groove_model: Groove2GrooveModelName = Groove2GrooveModelName.V01_DRUMS,
-                          groove2groove_seed: Optional[int] = None,
+                          groove2groove_seed: int = 42,
                           replace_if_file_exist = True,
                           verbose=True, 
                           python_exe_for_grv2grv_env='/home/ubuntu/.conda/envs/groove2groove/bin/python'):
@@ -40,7 +40,7 @@ def create_blend_per_part(content_midi_path: str,
                           (used to overcome plug-in problems for MIDI files without program mapping).
     :param groove2groove_temperature: Float between 0-1, groove2groove model temperature parameter. Higher = more random output.
     :param groove2groove_model: Groove2GrooveModelName or string, specifying the groove2groove model to use (v01_drums_vel, v01_drums, etc.).
-    :param groove2groove_seed: int, groove2groove random sampling seed (for obtaining different results).
+    :param groove2groove_seed: int, groove2groove random sampling seed (for obtaining different results). default=42.
     :param replace_if_file_exist: Bool flag. If True and output file exists, replace it with the new version.
     :param verbose: Bool flag. If True, print more information to the terminal.
     :param python_exe_for_grv2grv_env: Path to the Python executable with matching environment for groove2groove.
@@ -91,8 +91,10 @@ def create_blend_per_part(content_midi_path: str,
 
             if replace_if_file_exist or not midi_grv2grv_out_path.exists():
             # run groove2groove with the files
-                run_groove2groove(content_midi_file_part_no_drum, style_midi_file_part_no_drum, midi_grv2grv_out_path, model_name=groove2groove_model, 
-                                temperature=groove2groove_temperature, python_exe_for_grv2grv_env=python_exe_for_grv2grv_env, verbose=verbose)
+                run_groove2groove(content_midi_file_part_no_drum, style_midi_file_part_no_drum, 
+                                  midi_grv2grv_out_path, model_name=groove2groove_model, 
+                                temperature=groove2groove_temperature, seed=groove2groove_seed,
+                                python_exe_for_grv2grv_env=python_exe_for_grv2grv_env, verbose=verbose)
             elif verbose:
                 print(f"groove2groove output {midi_grv2grv_out_path} exists, skipping groove2groove run...")   
             
@@ -149,7 +151,7 @@ def parse_arguments():
     parser.add_argument("--groove2groove_model", type=str, default=Groove2GrooveModelName.V01_DRUMS.value, 
                         choices=[model.value for model in Groove2GrooveModelName], 
                         help="Groove2groove model to use.")
-    parser.add_argument("--groove2groove_seed", type=int, default=None, 
+    parser.add_argument("--groove2groove_seed", type=int, default=42, 
                         help="Groove2groove model random seed for sampling.")
     parser.add_argument("--replace_if_file_exist", type=bool, default=True, 
                         help="Replace the file if it exists.")
@@ -190,5 +192,5 @@ if __name__ == "__main__":
         output_folder = "/home/ubuntu/out_folder_test1"
         create_blend_per_part(content_midi_path=content_midi_path, content_structure_xls_path=content_structure_xls_path, 
                               style_midi_path=style_midi_path, style_structure_xls_path=style_structure_xls_path, 
-                              output_folder=output_folder, verbose=True, replace_if_file_exist=True,
+                              output_folder=output_folder, groove2groove_seed=33, verbose=True, replace_if_file_exist=True,
                               python_exe_for_grv2grv_env='/home/ubuntu/.conda/envs/groove2groove5/bin/python')

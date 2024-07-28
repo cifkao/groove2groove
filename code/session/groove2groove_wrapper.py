@@ -18,6 +18,7 @@ class Groove2GrooveModelName(str, Enum):
 def run_groove2groove(content_midi: str, style_midi: str, output_midi: str,
                       temperature: float = 0.4, 
                       model_name: Groove2GrooveModelName = Groove2GrooveModelName.V01_DRUMS, 
+                      seed: Optional[int] = None,
                       python_exe_for_grv2grv_env: str = None, 
                       verbose: bool = True):
     """
@@ -36,6 +37,8 @@ def run_groove2groove(content_midi: str, style_midi: str, output_midi: str,
     python_exe_for_grv2grv_env = 'python' if python_exe_for_grv2grv_env is None else python_exe_for_grv2grv_env 
     grv2grv_command = f"{python_exe_for_grv2grv_env} -m groove2groove.models.roll2seq_style_transfer --logdir './experiments/{model_name}' run-midi \
 --sample --softmax-temperature {temperature} '{content_midi}' '{style_midi}' '{output_midi}'"
+
+    grv2grv_command += f" --seed {seed}" if seed is not None else ""
 
     if verbose:
         print('running groove2groove:')
@@ -96,9 +99,9 @@ def run_groove2groove_evaluation_script(content_midi: str, style_midi: str, outp
         )
 
 if __name__=='__main__':
-    content_midi = style_midi = 'data/sync/data_for_sync/HitCraft_All_Files_Bank_Thin/Black Music Projects/Sub - Genre Afrobeat/57 Afrobeat #1 In F#m/Exports/57 Afrobeat #1 In F#m.midi'
+    content_midi = style_midi = 'data/HitCraft/Black Music Projects/Sub - Genre Afrobeat/57 Afrobeat #1 In F#m/Exports/57 Afrobeat #1 In F#m.midi'
     grv2grv_kwargs = dict(content_midi=content_midi, style_midi=style_midi, output_midi='output.mid', model_name='v01_drums', temperature='0.4', 
-                          python_exe_for_grv2grv_env='/home/ubuntu/.conda/envs/groove2groove5/bin/python')
+                          seed=33, python_exe_for_grv2grv_env='/home/ubuntu/.conda/envs/groove2groove5/bin/python')
     run_groove2groove(**grv2grv_kwargs)
     run_groove2groove_evaluation_script(**grv2grv_kwargs)
 

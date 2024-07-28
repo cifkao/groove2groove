@@ -62,7 +62,15 @@ def evaluate_style(sequences, ref_stats=None, ref_sequences=None, is_drum=False,
     return metrics
 
 def analyze_output(cont_midi_path, style_midi_path, out_midi_path,
-                   model_name=None, temperature=None):
+                   model_name=None, temperature=None, seed=None):
+    """save analysus results
+    :param cont_midi_path: Path to Content MIDI.
+    :param style_midi_path: Path to Style MIDI.
+    :param out_midi_path: Path to Groove2Groove output MIDI.
+    :param model_name: groove2groove model that was used for generating the output.
+    :param temperature: groove2groove temperature parameter that was used for generating the output.
+    :param seed: int, groove2groove random seed parameter that was used for generating the output.
+    """
     results = {}
     results['output_file'] = Path(out_midi_path).name 
     results['content_file'] = Path(cont_midi_path).name
@@ -71,6 +79,9 @@ def analyze_output(cont_midi_path, style_midi_path, out_midi_path,
         results['model_name'] = model_name
     if temperature is not None:
         results['temperature'] = temperature
+    if seed is not None:
+        results['seed'] = temperature
+
 
     cont_midi  = midi_io.midi_file_to_note_sequence(cont_midi_path)
     style_midi = midi_io.midi_file_to_note_sequence(style_midi_path)
@@ -100,6 +111,7 @@ def parse_args():
     parser.add_argument('--analysis_out_path', type=str, default=None, help="analysis json output path. If not given - the extension .analysis.json will be added to the original groove2groove output filename.")
     parser.add_argument('--model_name', type=str, default=None, help="Name of the groove2groove model.")
     parser.add_argument('--temperature', type=float, default=None, help="Temperature value that was used to generate the groove2groove output MIDI.")
+    parser.add_argument('--seed', type=int, default=None, help="Seed that was used for sampling the groove2groove output.")
     parser.add_argument('--verbose', type=bool, default=True, help='Verbose output. Default is True.')
     return parser.parse_args()
 
@@ -113,7 +125,8 @@ if __name__=='__main__':
                             style_midi_path=args.style_midi_path, 
                             out_midi_path=args.out_midi_path,
                             model_name=args.model_name,
-                            temperature=args.temperature)
+                            temperature=args.temperature,
+                            seed=args.seed)
 
     if args.verbose:
         print(f'Results: {results}')    
