@@ -53,14 +53,14 @@ Mandatory for: `session_grv2grv_self_blend_pipeline.py`:
   midi_path: Path to the input MIDI file that will be used as input for processing.      
   structure_xls_path: Path to the Excel file containing the parts' structure in Session42 format.
   output_folder: Desired output folder for the saving the self-blend outputs. 
-    Temporary files will be saved in a sub-folder temp
+    Temporary files will be saved in a sub-folder `temp/`
 
 Mandatory for: `session_grv2grv_full_pipeline.py`:
-  content_midi_path, 
-  content_structure_xls_path
-  style_midi_path=style_midi_path, 
-  style_structure_xls_path
-
+  content_midi_path: Path to content MIDI.
+  content_structure_xls_path: Path to Content Structure Excel.
+  style_midi_path: Path to Style MIDI. 
+  style_structure_xls_path:  Path to Style Structure Excel.
+  output_folder: Desired output folder (temporary files will be saved in `/temp` sub-folder)
 
 
 Additional options for both scripts:      
