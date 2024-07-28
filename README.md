@@ -3,13 +3,18 @@ This project provides utilities for pre-processing, post-processing, running gro
 It assumes Session42 MIDI inputs, where the instrument name is given as a "MIDI part name", together with xls that contains the division to "structure parts" by bars. 
 
 ### Overview - Blend Utility (mixing Contend MIDI and Style MIDI) and Self Blend Utilities.
-This project includes two main scripts: 
-1. Blending Session42 Content MIDI + Style MIDIs, MIDIs (The MIDIs are split and structure parts with identical name are being "blend" together):
-`code/session/session_grv2grv_full_pipeline.py` - for blending parts of different 
+#### Code
+The code is divided into two. Original groove2groove code can be found in ```code/groove2groove```.
 
-2. Self varianter- for creating new variants of MIDI parts (each part is blend with itself). 
-`code/session/session_grv2grv_self_blend_pipeline.py` 
+The additional code for hanlding Session42 MIDI files - preprocessing, postprocessing and groove2groove wrappers are found in ```code/session/```.
+In addition, the following two main scripts are found in the same directory: 
 
+1. `code/session/session_grv2grv_full_pipeline.py` - Blending script - for mixing Session42 Content MIDI + Style MIDIs, MIDIs (The MIDIs are split and structure parts with identical name are being "blend" together)
+
+2. `code/session/session_grv2grv_self_blend_pipeline.py` - A Self Varianter- for creating new variants of MIDI parts (each part is blend with itself). 
+ 
+
+#### Main functionality
 
 The main function within `session_grv2grv_full_pipeline.py` and `code/session/session_grv2grv_self_blend_pipeline.py` is `create_blend_per_part`.
 It is used for mixing Content+Style MIDI files using groove2groove, and composed of the foolowing steps:
@@ -18,9 +23,10 @@ It is used for mixing Content+Style MIDI files using groove2groove, and composed
 2. Splitting drums (if required, for adding the original drums in the post processing)
 3. Naive Sequential MIDI mapping  (if required, for overcoming plugin issues)
 4. Running groove2groove per part (each part servers as the `Style MIDI` and as the `Content MIDI` of the original groove2groove model).
-5. MIDI Mapping Back (if required, by adding the original instruments names)
-6. Adds the original drums (if requested)
-7. Possibly restores the BPM value of the original part (if required, for overcoming bugs).
+5. Calculating Groove2Groove Content+Style similarity metrics (as described in the groove2groove paper).
+6. MIDI Mapping Back (if required, by adding the original instruments names)
+7. Adds the original drums (if requested)
+8. Possibly restores the BPM value of the original part (if required, for overcoming bugs).
 
 Al the temporary files are saved under a `/temp` subfolder of the specified output folder, while the final self-blend output is saved in the provided output folder.
 
