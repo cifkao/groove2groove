@@ -78,10 +78,11 @@ Additional options:
 
 
 
-### additional notes:
+### Additional Notes:
 #### Time Signature: 
 The current groove2groove model supports only time signature of 4/4. It is possible to edit 3/4 time signature to 4/4 by using triola-legnth notes, but it is not clear what will be the quality of the output. 
-#### Drums: MIDI mapping of percussion was not handled within this project, therfore for the self blending, the original "Content MIDI" drums are added to the output.
+#### Drums: 
+MIDI mapping of percussion was not handled within this project, therfore for the self blending, the original "Content MIDI" drums are added to the output.
 Groove2groove model treats differently pitched instruments (where the midi number signifies pitch) and percussive instruments (where midi number signifies type of instrument). Mapping percussion plug-ins into MIDI numbers is more complicated, since the mapping should involve changing the MIDI Notes numbers. Therefore we currently do not support non-pitched MIDI Mapping.
 In principle - the "Style MIDI" drums should be taken into account for preserving the style. But due to non-pitched midi mapping limiation, and the unexpected result when running groove2groove with un-mapped drums, we decided to use the original drums. Moreover, the length of the Style might be different from the length of the Content + Output MIDIs. Therefore we decided to use the Content drums (in the case of self blend the Content and the Style are identical - so it does not matter).
 
