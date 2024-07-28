@@ -1,15 +1,14 @@
 # Session-Groove2Groove MIDI Blend Utilities
 This project provides utilities for pre-processing, post-processing, running groove2groove model, and creating blends and self-blends of MIDI files using the groove2groove model.
 It assumes Session42 MIDI inputs, where the instrument name is given as a "MIDI part name", together with xls that contains the division to "structure parts" by bars. 
-Two main scripts are included:
-1. Blending two Session42 MIDIs (one as "Content" and the other one as "Style"). The MIDIs are split and structure parts with identical name are being "blend" together.
-2. Self varianter- which mix each parts with itself creating new variations.
 
-
-## Overview - Blend Utility (mixing Contend MIDI and Style MIDI) and Self Blend Utilities.
+### Overview - Blend Utility (mixing Contend MIDI and Style MIDI) and Self Blend Utilities.
 This project includes two main scripts: 
-`code/session/session_grv2grv_full_pipeline.py` - for blending parts of different Content + Style MIDIs, 
-`code/session/session_grv2grv_self_blend_pipeline.py` - for creating new variants of MIDI parts (with themselves).
+1. Blending Session42 Content MIDI + Style MIDIs, MIDIs (The MIDIs are split and structure parts with identical name are being "blend" together):
+`code/session/session_grv2grv_full_pipeline.py` - for blending parts of different 
+
+2. Self varianter- for creating new variants of MIDI parts (each part is blend with itself). 
+`code/session/session_grv2grv_self_blend_pipeline.py` 
 
 The main function within `session_grv2grv_full_pipeline.py` is `create_self_blend_per_part`, which divides the MIDI files to their parts (as given in Session Format structure xls file), splits the drums (if required), performs naive sequential MIDI mapping (if required, for overcoming plugin issues), then runs groove2groove model for per part (each part servers as the `Style MIDI` and as the `Content MIDI`), maps MIDI back by adding the original instruments names (if required), adds original drums (if requested), and possibly restores the BPM value of the original part.
 
