@@ -1,4 +1,4 @@
-from typing import Dict, Tuple, List
+from typing import Dict, Tuple, List, Optional
 import sys
 from pathlib import Path
 import argparse
@@ -16,6 +16,7 @@ def create_blend_per_part(content_midi_path: str,
                           auto_map_midi = True,
                           groove2groove_temperature:float = 0.4,
                           groove2groove_model: Groove2GrooveModelName = Groove2GrooveModelName.V01_DRUMS,
+                          groove2groove_seed: Optional[int] = None,
                           replace_if_file_exist = True,
                           verbose=True, 
                           python_exe_for_grv2grv_env='/home/ubuntu/.conda/envs/groove2groove/bin/python'):
@@ -39,6 +40,7 @@ def create_blend_per_part(content_midi_path: str,
                           (used to overcome plug-in problems for MIDI files without program mapping).
     :param groove2groove_temperature: Float between 0-1, groove2groove model temperature parameter. Higher = more random output.
     :param groove2groove_model: Groove2GrooveModelName or string, specifying the groove2groove model to use (v01_drums_vel, v01_drums, etc.).
+    :param groove2groove_seed: int, groove2groove random sampling seed (for obtaining different results).
     :param replace_if_file_exist: Bool flag. If True and output file exists, replace it with the new version.
     :param verbose: Bool flag. If True, print more information to the terminal.
     :param python_exe_for_grv2grv_env: Path to the Python executable with matching environment for groove2groove.
@@ -99,8 +101,11 @@ def create_blend_per_part(content_midi_path: str,
             if replace_if_file_exist or not analysis_out_path.exists():
                 run_groove2groove_evaluation_script(content_midi_file_part_no_drum, style_midi_file_part_no_drum, midi_grv2grv_out_path, 
                                                     analysis_out_path = analysis_out_path,
-                                                    model_name=groove2groove_model,  temperature=groove2groove_temperature, 
-                                                    python_exe_for_grv2grv_env=python_exe_for_grv2grv_env, verbose=verbose)
+                                                    model_name=groove2groove_model,  
+                                                    temperature=groove2groove_temperature,
+                                                    seed=groove2groove_seed, 
+                                                    python_exe_for_grv2grv_env=python_exe_for_grv2grv_env, 
+                                                    verbose=verbose)
             elif verbose:
                 print(f"groove2groove evaluation file {analysis_out_path} exists, skipping groove2groove evaluation run...")  
 
@@ -144,6 +149,8 @@ def parse_arguments():
     parser.add_argument("--groove2groove_model", type=str, default=Groove2GrooveModelName.V01_DRUMS.value, 
                         choices=[model.value for model in Groove2GrooveModelName], 
                         help="Groove2groove model to use.")
+    parser.add_argument("--groove2groove_seed", type=int, default=None, 
+                        help="Groove2groove model random seed for sampling.")
     parser.add_argument("--replace_if_file_exist", type=bool, default=True, 
                         help="Replace the file if it exists.")
     parser.add_argument("--verbose", type=bool, default=True, 
@@ -167,6 +174,7 @@ if __name__ == "__main__":
             auto_map_midi=args.auto_map_midi,
             groove2groove_temperature=args.groove2groove_temperature,
             groove2groove_model=Groove2GrooveModelName(args.groove2groove_model),
+            groove2groove_seed=args.groove2groove_seed,
             replace_if_file_exist=args.replace_if_file_exist,
             verbose=args.verbose,
             python_exe_for_grv2grv_env=args.python_exe_for_grv2grv_env)

@@ -61,7 +61,8 @@ def run_groove2groove(content_midi: str, style_midi: str, output_midi: str,
 def run_groove2groove_evaluation_script(content_midi: str, style_midi: str, output_midi: str,
                                         analysis_out_path: Optional[str] = None,
                                         temperature: Optional[float] = None, 
-                                        model_name: Optional[Groove2GrooveModelName] = None, 
+                                        model_name: Optional[Groove2GrooveModelName] = None,
+                                        seed: Optional[int] = None, 
                                         python_exe_for_grv2grv_env: Optional[str] = None, 
                                         verbose: bool = True):
 
@@ -71,6 +72,7 @@ def run_groove2groove_evaluation_script(content_midi: str, style_midi: str, outp
     grv2grv_evaluation_command += f" --analysis_out_path '{analysis_out_path}'" if analysis_out_path is not None else ""
     grv2grv_evaluation_command += f" --model_name {model_name}" if model_name is not None else ""
     grv2grv_evaluation_command += f" --temperature {temperature}" if temperature is not None else ""
+    grv2grv_evaluation_command += f" --seed {seed}" if seed is not None else ""
     grv2grv_evaluation_command += f" --verbose {verbose}"
 
     if verbose:

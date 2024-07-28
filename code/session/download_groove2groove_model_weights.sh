@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # script for downloading groove2groove model weights (model name should be given as argument)
-# Valid values for model_name: v01_drums, v01_drums_vel, v01, v0_vel
 
 if [ $# -eq 0 ]; then
     echo "No model_name provided. Valid values are: v01_drums, v01_drums_vel, v01, v0_vel"
