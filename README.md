@@ -1,17 +1,28 @@
 # Session-Groove2Groove MIDI Blend Utilities
 This project provides utilities for pre-processing, post-processing, running groove2groove model, and creating blends and self-blends of MIDI files using the groove2groove model.
+It assumes Session42 MIDI inputs, where the instrument name is given as a "MIDI part name", together with xls that contains the division to "structure parts" by bars. 
+Two main scripts are included:
+1. Blending two Session42 MIDIs (one as "Content" and the other one as "Style"). The MIDIs are split and structure parts with identical name are being "blend" together.
+2. Self varianter- which mix each parts with itself creating new variations.
+
 
 ## Overview - Blend Utility (mixing Contend MIDI and Style MIDI) and Self Blend Utilities.
 This project includes two main scripts: 
 `code/session/session_grv2grv_full_pipeline.py` - for blending parts of different Content + Style MIDIs, 
-and `code/session/session_grv2grv_self_blend_pipeline.py` - for creating new variants of MIDI parts (with themselves).
-
+`code/session/session_grv2grv_self_blend_pipeline.py` - for creating new variants of MIDI parts (with themselves).
 
 The main function within `session_grv2grv_full_pipeline.py` is `create_self_blend_per_part`, which divides the MIDI files to their parts (as given in Session Format structure xls file), splits the drums (if required), performs naive sequential MIDI mapping (if required, for overcoming plugin issues), then runs groove2groove model for per part (each part servers as the `Style MIDI` and as the `Content MIDI`), maps MIDI back by adding the original instruments names (if required), adds original drums (if requested), and possibly restores the BPM value of the original part.
 
 Temporary files are saved under a `temp` subfolder of the specified output folder, while the final self-blend output is saved in the provided output folder.
 
+A few notes:
+Note about Time Signature: the current groove2groove model supports only time signature of 4/4. It is possible to edit 3/4 time signature to 4/4 by using triola-legnth notes, but it is not clear what will be the quality of the output. 
+Note about drums: MIDI mapping of percussion was not handled within this project, therfore for the self blending, the original "Content MIDI" drums are added to the output.
+In principle - the "Style MIDI" drums should be taken into account, but due to limiation im midi mapping and in running groove2groove with the un-mapped drums, we decided to use the original drums. Moreover, the length of the Style might be different from the Content+Output (which are identical), therefore we decided to use the Content drums (in the case of self blend the Content and the Style are identical - so it does not matter).
+MIDI mapping - the current implementation support Sequential MIDI mapping to overcome plug-in issues, and run groove2groove correctly. The sequential MIDI program numbers are mapped back at the post-processing stage. Mixing songs with mapping and songs without is currnly not supported.
+
 ## Technicalities
+### Creating environment and downloading weights:
 While groove2groove original model requires python <=3.6 to support deprecated tensorflow, Music21 package requires a newer version. Therefore two python environments must be defined.
 
 The main script should be used from the new python env, while providing the executable to the python3.6 with groove2groove dependencies as a parameter (groove2groove call is done via sub-process with this executable).
@@ -22,14 +33,12 @@ Therefore, before running the scripts, the two environments should be build:
 ```conda env create -f session_environment.yml```
 ```conda activate session```
 
-In addition - groove2groove model weights must be downloaded first. This can be done using the utility script:
+In addition - groove2groove model weights must be downloaded first. 
+This can be done using the utility script, where <model_name> must be one of: `v01_drums`, `v01_drums_vel`, `v01`, `v0_vel` :
 
 ```code/session/download_groove2groove_model_weights.sh <model_name>```
 
-<model_name> must be one of: `v01_drums`, `v01_drums_vel`, `v01`, `v0_vel`
-
 ### Description
-
 Util function for creating a self-blend per part of a MIDI file using groove2groove. Self-blend involves partitioning the MIDI into parts (according to a given XLS), splitting drums, sequential MIDI mapping, running groove2groove for each part with itself, MIDI mapping back, adding the original drums, and possibly restoring the BPM value of the original part.
 
 
