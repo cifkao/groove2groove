@@ -1,4 +1,4 @@
-# Session-Groove2Groove MIDI Blend Utilities
+# Session42-Groove2Groove MIDI Blend Utilities
 This project provides utilities for pre-processing, post-processing, running groove2groove model, and creating blends and self-blends of MIDI files using the groove2groove model.
 It assumes Session42 MIDI inputs, where the instrument name is given as a "MIDI part name", together with xls that contains the division to "structure parts" by bars. 
 
