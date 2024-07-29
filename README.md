@@ -52,15 +52,15 @@ This can be done using the utility script, where <model_name> must be one of: `v
 ```code/session/download_groove2groove_model_weights.sh <model_name>```
 
 ### Usage
-#### From command line:
-You can run the `session_grv2grv_full_pipeline.py` script from the command line. 
-Here is an example for command line:
+#### Command Line:
+You can run the `session_grv2grv_full_pipeline.py` and `run_example_session_grv2grv_self_blend_pipeline` scripts from the command line. 
+Here is an example for running from command line:
 ```python code/session/session_grv2grv_self_blend_pipeline.py path_to_midi_file path_to_structure_xls output_folder --required_parts part1 part2 --auto_map_midi True --groove2groove_temperature 0.4 --groove2groove_model v01_drums --replace_if_file_exist True --verbose True --python_exe_for_grv2grv_env /path/to/python_executable```
 
-#### Example scripts:
-For your convinience - here are example scripts, which use example data that can be found under data/Hitcraft_Examples:
+#### Example shell scripts with example data:
+For your convinience - here are example shell scripts, which use example data from data/Hitcraft_Examples together with the commands:
 `code/session/run_example_session_grv2grv_self_blend_pipeline.sh`
-`code/session/run_example_session_grv2grv_self_blend_pipeline.sh`
+`code/session/run_example_session_grv2grv_full_pipeline.sh`
 
 #### Parameters:
 Mandatory for: `session_grv2grv_self_blend_pipeline.py`:
