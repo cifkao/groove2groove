@@ -1,3 +1,10 @@
+"""
+This file contains a script for blending two Session MIDIs per-part.
+The input MIDIs are assumed to be in session42 format (plug-ins/instruments as midi part names), 
+together with xls files containing the partition to structure parts. 
+Further information is provided in the README.md file
+"""
+
 from typing import Dict, Tuple, List, Optional
 import sys
 from pathlib import Path
@@ -52,7 +59,7 @@ def create_blend_per_part(content_midi_path: str,
     grv2grv_extension = (('D' if 'drum' in str(groove2groove_model) else '') + ('V' if 'vel' in str(groove2groove_model) else '') + 
                          '_T' + str(groove2groove_temperature).replace('.','')) 
 
-    # for fixing bpm  
+    # for fixing bpm bug 
     replace_bpm = False
     # define preprocess output folder
     preprocess_out_folder = Path(output_folder) / 'temp'
@@ -164,33 +171,18 @@ def parse_arguments():
     return args
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        args = parse_arguments()
-        create_blend_per_part(
-            content_midi_path=args.content_midi_path,
-            content_structure_xls_path=args.content_structure_xls_path,
-            style_midi_path=args.style_midi_path,
-            style_structure_xls_path=args.style_structure_xls_path,
-            output_folder=args.output_folder,
-            required_parts=args.required_parts,
-            auto_map_midi=args.auto_map_midi,
-            groove2groove_temperature=args.groove2groove_temperature,
-            groove2groove_model=Groove2GrooveModelName(args.groove2groove_model),
-            groove2groove_seed=args.groove2groove_seed,
-            replace_if_file_exist=args.replace_if_file_exist,
-            verbose=args.verbose,
-            python_exe_for_grv2grv_env=args.python_exe_for_grv2grv_env)
-
-    else:
-        # TODO: get rid of this - NATAN - Maybe add example files?
-        print('NO arguments were given, using a default')
-        content_midi_path = "data/HitCraft/Black Music Projects/Sub - Genre Afrobeat/57 Afrobeat #1 In F#m/Exports/57 Afrobeat #1 In F#m.midi" 
-        content_structure_xls_path = "data/HitCraft/Black Music Projects/Sub - Genre Afrobeat/57 Afrobeat #1 In F#m/Exports/57 Afrobeat #1 In F#m St.xlsx" 
-        style_midi_path = "data/HitCraft/Black Music Projects/Sub - Genre Reggae/18 Reggae 2 In Bm/Exports/18 Reggae 2 In Bm.midi"
-        style_structure_xls_path = "data/HitCraft/Black Music Projects/Sub - Genre Reggae/18 Reggae 2 In Bm/Exports/18 Reggae 2 In Bm St.xlsx"
-
-        output_folder = "/home/ubuntu/out_folder_test1"
-        create_blend_per_part(content_midi_path=content_midi_path, content_structure_xls_path=content_structure_xls_path, 
-                              style_midi_path=style_midi_path, style_structure_xls_path=style_structure_xls_path, 
-                              output_folder=output_folder, groove2groove_seed=33, verbose=True, replace_if_file_exist=True,
-                              python_exe_for_grv2grv_env='/home/ubuntu/.conda/envs/groove2groove5/bin/python')
+    args = parse_arguments()
+    create_blend_per_part(
+        content_midi_path=args.content_midi_path,
+        content_structure_xls_path=args.content_structure_xls_path,
+        style_midi_path=args.style_midi_path,
+        style_structure_xls_path=args.style_structure_xls_path,
+        output_folder=args.output_folder,
+        required_parts=args.required_parts,
+        auto_map_midi=args.auto_map_midi,
+        groove2groove_temperature=args.groove2groove_temperature,
+        groove2groove_model=Groove2GrooveModelName(args.groove2groove_model),
+        groove2groove_seed=args.groove2groove_seed,
+        replace_if_file_exist=args.replace_if_file_exist,
+        verbose=args.verbose,
+        python_exe_for_grv2grv_env=args.python_exe_for_grv2grv_env)

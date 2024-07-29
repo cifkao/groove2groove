@@ -1,3 +1,10 @@
+"""
+This file contains a script for creating self-variants of a Session MIDI.
+The input MIDI is assumed to be in session42 format (plug-ins/instruments as midi part names), 
+together with an xls file containing the partition to structure parts. 
+Further information is provided in the README.md file
+"""
+
 from typing import List, Optional
 import sys
 from pathlib import Path
@@ -5,7 +12,6 @@ import argparse
 from session_grv2grv_full_pipeline import create_blend_per_part
 from groove2groove_wrapper import Groove2GrooveModelName
 
-# run self blend
 
 def create_self_blend_per_part(midi_path: str, 
                                structure_xls_path: str,
@@ -86,27 +92,16 @@ def parse_arguments():
     return args
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        args = parse_arguments()
-        create_self_blend_per_part(
-            midi_path=args.midi_path,
-            structure_xls_path=args.structure_xls_path,
-            output_folder=args.output_folder,
-            required_parts=args.required_parts,
-            auto_map_midi=args.auto_map_midi,
-            groove2groove_temperature=args.groove2groove_temperature,
-            groove2groove_model=Groove2GrooveModelName(args.groove2groove_model),
-            groove2groove_seed=args.groove2groove_seed,
-            replace_if_file_exist=args.replace_if_file_exist,
-            verbose=args.verbose,
-            python_exe_for_grv2grv_env=args.python_exe_for_grv2grv_env)
-
-    else:
-        # TODO: get rid of this - NATAN - Maybe add example files?
-        print('NO arguments were given, using a default')
-        midi_path = "data/HitCraft/Black Music Projects/Sub - Genre Afrobeat/57 Afrobeat #1 In F#m/Exports/57 Afrobeat #1 In F#m.midi" 
-        structure_xls_path = "data/HitCraft/Black Music Projects/Sub - Genre Afrobeat/57 Afrobeat #1 In F#m/Exports/57 Afrobeat #1 In F#m St.xlsx" 
-        output_folder = "/home/ubuntu/out_folder_test1"
-        create_self_blend_per_part(midi_path=midi_path, structure_xls_path=structure_xls_path, 
-                                output_folder=output_folder, groove2groove_seed=33, verbose=True, replace_if_file_exist=True,
-                                python_exe_for_grv2grv_env='/home/ubuntu/.conda/envs/groove2groove5/bin/python')
+    args = parse_arguments()
+    create_self_blend_per_part(
+        midi_path=args.midi_path,
+        structure_xls_path=args.structure_xls_path,
+        output_folder=args.output_folder,
+        required_parts=args.required_parts,
+        auto_map_midi=args.auto_map_midi,
+        groove2groove_temperature=args.groove2groove_temperature,
+        groove2groove_model=Groove2GrooveModelName(args.groove2groove_model),
+        groove2groove_seed=args.groove2groove_seed,
+        replace_if_file_exist=args.replace_if_file_exist,
+        verbose=args.verbose,
+        python_exe_for_grv2grv_env=args.python_exe_for_grv2grv_env)

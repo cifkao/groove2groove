@@ -99,9 +99,9 @@ def run_groove2groove_evaluation_script(content_midi: str, style_midi: str, outp
         )
 
 if __name__=='__main__':
-    content_midi = style_midi = 'data/HitCraft/Black Music Projects/Sub - Genre Afrobeat/57 Afrobeat #1 In F#m/Exports/57 Afrobeat #1 In F#m.midi'
+    content_midi = style_midi = 'data/HitCraft_Examples/Black Music Projects/Sub - Genre Afrobeat/57 Afrobeat #1 In F#m/Exports/57 Afrobeat #1 In F#m.midi'
     grv2grv_kwargs = dict(content_midi=content_midi, style_midi=style_midi, output_midi='output.mid', model_name='v01_drums', temperature='0.4', 
-                          seed=33, python_exe_for_grv2grv_env='/home/ubuntu/.conda/envs/groove2groove5/bin/python')
+                          seed=33, python_exe_for_grv2grv_env='/home/ubuntu/.conda/envs/groove2groove/bin/python')
     run_groove2groove(**grv2grv_kwargs)
     run_groove2groove_evaluation_script(**grv2grv_kwargs)
 
