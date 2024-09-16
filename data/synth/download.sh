@@ -1,7 +1,7 @@
 #!/bin/bash
 archive_name=groove2groove-data-v1.0.0
 archive=$archive_name.tar.gz
-download_url="https://zenodo.org/record/3958000/files/$archive?download=1"
+download_url="https://zenodo.org/records/3958000/files/$archive?download=1"
 checksum=c407de7b3676267660c88dc6ee351c79
 
 set -e
